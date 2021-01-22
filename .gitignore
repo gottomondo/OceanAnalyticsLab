@@ -1,0 +1,8 @@
+globalvariables.csv
+indir/
+outFile
+*.nc
+*.png
+*.json
+*__pycache__*
+.idea
