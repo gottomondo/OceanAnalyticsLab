@@ -3,6 +3,7 @@
 import os
 import glob
 import shutil
+import sys
 
 import check_json
 
@@ -17,6 +18,24 @@ def get_args():
     parse.add_argument('dirID', type=str, help="D4Science directory ID")
 
     return parse.parse_args()
+
+
+def filter_list(list_file, output_type):
+    """
+    This function filters the input list and return a new list with the files that have
+    the type of files desired
+    @param list_file: list containing (id, file_name) pairs
+    @param output_type: file type you want to download from list_file
+    @return: list that contains only files of desired type
+    """
+
+    llist = list()
+    for file in list_file:
+        if output_type in file[1]:
+            llist.append(file)
+            break   # remove if you want to download all files
+
+    return llist
 
 
 def make_indir(dirID):
@@ -34,17 +53,22 @@ def make_indir(dirID):
     os.mkdir("indir")
     # GET CONTENT OF input_datasets/test_med_rea16 or input_datasets/appo
     print("START ItemChildren")
-    myshfo = storagehubfacilitypython.StorageHubFacility(operation="ItemChildren",
-                                                         ItemId=dirID)
-    myshfo.main()
+    try:
+        myshfo = storagehubfacilitypython.StorageHubFacility(operation="ItemChildren", ItemId=dirID)
+        myshfo.main()
+    except Exception as e:
+        print(e, file=sys.stderr)
+        raise Exception('Download error')
 
     mobj = json.load(open('outFile'))
     complete_list = check_json.get_id(mobj)  # list of (id, name_file) pairs
+    filtered_list = filter_list(complete_list, '.nc')
 
-    # download the first file
-    myshfo = storagehubfacilitypython.StorageHubFacility(operation="Download", ItemId=complete_list[0][0],
-                                                         localFile=wdir + "/" + complete_list[0][1])
-    myshfo.main()
+    # download
+    for x in filtered_list:
+        myshfo = storagehubfacilitypython.StorageHubFacility(operation="Download", ItemId=x[0],
+                                                             localFile=wdir + "/" + x[1])
+        myshfo.main()
 
 
 def main():

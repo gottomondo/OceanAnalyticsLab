@@ -8,9 +8,9 @@ This method simply download a netCDF file from D4science workspace and return it
 
 To launch the tools simpy run the command:
 
-`python seastat.py $dirID`
+`python mockup.py $dirID`
 
-where **dirID** is the id of the directory from which you want to download the file.
+where **dirID** is the id of the d4science directory from which you want to download the file.
 You can find the id simply by right-clicking on a directory in the workspace and selecting **info**
 
 
