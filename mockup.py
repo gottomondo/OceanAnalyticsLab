@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-import os
 import glob
 import shutil
 import sys
-import check_json
 import time
 import datetime
 from tools import json_builder
 from dateutil.tz import tzutc
+from download import daccess
 
 wdir = "./indir"
 
@@ -18,74 +17,32 @@ def get_args():
 
     parse = argparse.ArgumentParser(description="Mockup method")
 
-    parse.add_argument('dirID', type=str, help="D4Science directory ID")
+    parse.add_argument('dataset', type=str, help="Source dataset to download")
 
     return parse.parse_args()
-
-
-def filter_list(list_file, output_type):
-    """
-    This function filters the input list and return a new list with the files that have
-    the type of files desired
-    @param list_file: list containing (id, file_name) pairs
-    @param output_type: file type you want to download from list_file
-    @return: list that contains only files of desired type
-    """
-
-    llist = list()
-    for file in list_file:
-        if output_type in file[1]:
-            llist.append(file)
-            break  # remove if you want to download all files
-
-    return llist
-
-
-def make_indir(dirID):
-    """
-    This function downloads the first file founded in directory with id = dirID
-    @dirID: D4Science directory ID from which download a file
-    """
-    import json
-    import storagehubfacilitypython
-
-    if os.path.isdir(wdir):
-        print(wdir + ' already exists, please remove it')
-        return
-
-    os.mkdir("indir")
-    # GET CONTENT OF input_datasets/test_med_rea16 or input_datasets/appo
-    print("START ItemChildren")
-    try:
-        myshfo = storagehubfacilitypython.StorageHubFacility(operation="ItemChildren", ItemId=dirID)
-        myshfo.main()
-    except Exception as e:
-        print(e, file=sys.stderr)
-        raise Exception('Download error')
-
-    mobj = json.load(open('outFile'))
-    complete_list = check_json.get_id(mobj)  # list of (id, name_file) pairs
-    filtered_list = filter_list(complete_list, '.nc')
-
-    # download
-    for x in filtered_list:
-        myshfo = storagehubfacilitypython.StorageHubFacility(operation="Download", ItemId=x[0],
-                                                             localFile=wdir + "/" + x[1])
-        myshfo.main()
 
 
 def main():
     main_start_time = time.time()
     args = get_args()
-    dirId = args.dirID
     exec_log = json_builder.get_exec_log()
+
+    # ------------ parameter declaration ------------ #
+    # direct declaration of parameters, you should able to extract these information from input_parameters
+    dataset = args.dataset
+    fields = ['sea_water_potential_temperature']
+    daccess_working_domain = dict()
+    daccess_working_domain['time'] = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
+    daccess_working_domain['depth'] = [10, 100]
+    daccess_working_domain['lonLat'] = [-1.99, 1, 34, 37]
 
     # ------------ file download ------------ #
     print("START MakeInDir")
     exec_log.add_message("Start Download files")
     try:
         start_dl_time = time.time()
-        make_indir(dirId)
+        dcs = daccess.Daccess(dataset, fields)
+        dcs.download(daccess_working_domain)
     except Exception as e:
         print(e, file=sys.stderr)
         err_log = json_builder.LogError(-1, str(e))
@@ -95,7 +52,7 @@ def main():
     # move only the first file in wdir and rename to output.nc
     for file in glob.glob(wdir + "/*.nc"):
         print(file)
-        shutil.move(file, "output.nc")
+        shutil.copy(file, "output.nc")
         break
 
     # Save info in json file
