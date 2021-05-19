@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import glob
-import shutil
 import sys
 import time
 import datetime
+import netCDF4
 from tools import json_builder
 from dateutil.tz import tzutc
 from download import daccess
@@ -20,6 +19,21 @@ def get_args():
     parse.add_argument('dataset', type=str, help="Source dataset to download")
 
     return parse.parse_args()
+
+
+def clone_nc_dataset(nc_source, nc_dest):
+    nc_dest.setncatts(nc_source.__dict__)
+
+    for name, dimension in nc_source.dimensions.items():
+        nc_dest.createDimension(
+            name, (len(dimension) if not dimension.isunlimited() else None))
+
+    # create all necessary variables in dailyFile
+    for name, variable in nc_source.variables.items():
+        nc_dest.createVariable(name, variable.datatype, variable.dimensions)
+        # copy variable attributes all at once via dictionary
+        nc_dest[name].setncatts(nc_source[name].__dict__)
+        nc_dest[name][:] = nc_source[name][:]
 
 
 def main():
@@ -42,18 +56,16 @@ def main():
     try:
         start_dl_time = time.time()
         dcs = daccess.Daccess(dataset, fields)
-        dcs.download(daccess_working_domain)
+        nc_dataset = dcs.download(daccess_working_domain)
     except Exception as e:
         print(e, file=sys.stderr)
         err_log = json_builder.LogError(-1, str(e))
         error_exit(err_log, exec_log)
     exec_log.add_message("Complete Download files", time.time() - start_dl_time)
 
-    # move only the first file in wdir and rename to output.nc
-    for file in glob.glob(wdir + "/*.nc"):
-        print(file)
-        shutil.copy(file, "output.nc")
-        break
+    nc_output = netCDF4.Dataset('output.nc', mode='w')
+    clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
+    nc_output.close()
 
     # Save info in json file
     exec_log.add_message("Total time: " + " %s seconds " % (time.time() - main_start_time))
