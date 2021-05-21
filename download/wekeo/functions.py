@@ -96,6 +96,7 @@ def get_token_from_wekeo(hda_dict):
     if response.status_code == hda_dict["CONST_HTTP_SUCCESS_CODE"]:
         access_token = json.loads(response.text)['access_token']
         print("Success: Access token is " + access_token)
+        return access_token
     else:
         print(response.headers)
         raise Exception("Error: Unexpected response {}".format(response))
