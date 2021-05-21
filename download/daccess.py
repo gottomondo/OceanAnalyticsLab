@@ -1,4 +1,3 @@
-from __future__ import annotations
 from download.context import DownloadContext, InputContext
 import os
 import json

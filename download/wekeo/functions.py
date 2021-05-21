@@ -1,8 +1,9 @@
-import requests, re, json
 import base64
-import shutil
-import time, os
-import urllib.parse
+import os
+import time
+import json
+import re
+import requests
 
 
 def generate_api_key(username, password):
@@ -201,20 +202,28 @@ def get_request_status(hda_dict):
                   interact with the HDA API
     """
     status = "not started"
+    start_time = time.time()
+    timeout = 120
     count = 0
-    while (status != "completed"):
+    while status != "completed":
         count = count + 1
         if count > 20:
             print('Waiting 5 seconds...')
             time.sleep(5)
-        response = requests.get(hda_dict['broker_endpoint'] + \
-                                '/datarequest/status/' + hda_dict['job_id'], \
+        response = requests.get(hda_dict['broker_endpoint'] + '/datarequest/status/' + hda_dict['job_id'],
                                 headers=hda_dict['headers'])
-        if (response.status_code == hda_dict['CONST_HTTP_SUCCESS_CODE']):
+        if response.status_code == hda_dict['CONST_HTTP_SUCCESS_CODE']:
             status = json.loads(response.text)['status']
-            print("Query successfully submitted. Status is " + status)
+            if 'fail' not in status:
+                print("Query successfully submitted. Status is " + status)
+            else:
+                message = json.loads(response.text)['message']
+                raise Exception("Query has failed with message: ", message)
         else:
-            print("Error: Unexpected response {}".format(response))
+            raise Exception("Error: Unexpected response {}".format(response))
+
+        if time.time() - start_time > timeout:
+            raise Exception("ERROR: Timeout reached")
 
 
 def get_results_list(hda_dict):
@@ -323,9 +332,7 @@ def get_order_status(hda_dict, order_id):
 
 
 def downloadFileMemory(url, headers, file_name):
-    from download import daccess
     import netCDF4
-    print('Here1')
     r = requests.get(url, headers=headers, stream=True)
 
     if r.status_code == 200:
