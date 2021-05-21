@@ -62,7 +62,7 @@ def init(dataset_id, api_key, download_dir_path):
     return hda_dict
 
 
-def get_access_token(hda_dict):
+def get_access_token(hda_dict, bluecloud_proxy=True):
     """ 
     Requests an access token to use the HDA API and stores it as separate
     key in the dictionary
@@ -73,32 +73,52 @@ def get_access_token(hda_dict):
     
     Returns:
         Returns the dictionary including the access token
+        @param bluecloud_proxy: request token using bluecloud proxy
     """
+
+    if bluecloud_proxy:
+        hda_dict['access_token'] = get_token_from_bluecloud_proxy()
+    else:
+        hda_dict['access_token'] = get_token_from_wekeo(hda_dict)
+    hda_dict['headers'] = {'Authorization': 'Bearer ' + hda_dict["access_token"], 'Accept': 'application/json'}
+    return hda_dict
+
+
+def get_token_from_wekeo(hda_dict):
     headers = {
         'Authorization': 'Basic ' + hda_dict['api_key']
     }
-    data = [
-        ('grant_type', 'client_credentials'),
-    ]
     print("Getting an access token. This token is valid for one hour only.")
-    response = requests.get(hda_dict['accessToken_address'], \
-                            headers=headers, verify=False)
+    response = requests.get(hda_dict['accessToken_address'], headers=headers, verify=False)
 
-    # If the HTTP response code is 200 (i.e. success), then retrive the 
+    # If the HTTP response code is 200 (i.e. success), then retrive the
     # token from the response
-    if (response.status_code == hda_dict["CONST_HTTP_SUCCESS_CODE"]):
+    if response.status_code == hda_dict["CONST_HTTP_SUCCESS_CODE"]:
         access_token = json.loads(response.text)['access_token']
-
         print("Success: Access token is " + access_token)
     else:
-        print("Error: Unexpected response {}".format(response))
         print(response.headers)
+        raise Exception("Error: Unexpected response {}".format(response))
 
-    hda_dict['access_token'] = access_token
-    hda_dict['headers'] = {'Authorization': 'Bearer ' + \
-                                            hda_dict["access_token"], 'Accept': 'application/json'}
-    return hda_dict
 
+def get_token_from_bluecloud_proxy():
+    from download import utils
+    from requests.auth import HTTPBasicAuth
+
+    globalVariablesFile = os.path.dirname(__file__).split('download')[0] + '/globalvariables.csv'
+    gcubeToken = utils.get_gcube_token(globalVariablesFile)
+
+    hprops = {"Accept": "application/json"}
+    urlString = "https://data.d4science.org/wekeo/gettoken"
+    r = requests.get(urlString, headers=hprops, auth=HTTPBasicAuth("gcube-token", gcubeToken))
+    if r.status_code != 200:
+        error = "Error in Get Token {} {}".format(r.status_code, r.text)
+        print(error)
+        raise Exception(error)
+    t = json.loads(r.text)
+    token = t["access_token"]
+    print("Token:", token)
+    return token
 
 def query_metadata(hda_dict):
     """ 

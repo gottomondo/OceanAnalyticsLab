@@ -54,7 +54,7 @@ class Daccess:
         @param dataset: source dataset
         @param fields: cf standard name used to represent a variable
         @param outDir: output directory
-        @param hdaKey: key to access to hda service
+        @param hdaKey: key to access to hda service, leave "" if you want to use bluecloud proxy
         """
         self.fields = fields
         self.outDir = outDir

@@ -23,6 +23,8 @@ A file named **globalvariables.csv** will be created and used to download the fi
 
 then put your key in hdaKey param [daccess.py](./download/daccess.py)
 
+##### Attention: by default the system use bluecloud proxy to request the token to access to hda, if you put your hda key the proxy will be disabled
+
 3. (Optional) you can change dirID in  [daccess.py](./download/daccess.py) if you want
 to download your dataset from StorageHub
 
