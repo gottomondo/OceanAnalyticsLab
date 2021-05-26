@@ -46,7 +46,10 @@ def main():
     dataset = args.dataset
     fields = ['sea_water_potential_temperature']
     daccess_working_domain = dict()
-    daccess_working_domain['time'] = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
+    if dataset == "GLOBAL_ANALYSIS_FORECAST_PHY_001_024":
+        daccess_working_domain['time'] = ['2019-01-01T00:00:00', '2019-01-31T00:00:00']
+    else:
+        daccess_working_domain['time'] = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
     daccess_working_domain['depth'] = [10, 100]
     daccess_working_domain['lonLat'] = [-1.99, 1, 34, 37]
 
