@@ -48,10 +48,13 @@ def main():
     daccess_working_domain = dict()
     if dataset == "GLOBAL_ANALYSIS_FORECAST_PHY_001_024":
         daccess_working_domain['time'] = ['2019-01-01T00:00:00', '2019-01-31T00:00:00']
+    elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
+        daccess_working_domain['time'] = ['2020-07-01T00:00:00', '2020-07-31T00:00:00']
+        fields = ['mass_concentration_of_chlorophyll_a_in_sea_water']
     else:
         daccess_working_domain['time'] = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
     daccess_working_domain['depth'] = [10, 100]
-    daccess_working_domain['lonLat'] = [-1.99, 1, 34, 37]
+    daccess_working_domain['lonLat'] = [-6, 36.5, 30, 46]
 
     # ------------ file download ------------ #
     print("START MakeInDir")

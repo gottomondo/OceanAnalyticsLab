@@ -57,11 +57,11 @@ class InHDA(InputStrategy):
                     depth: depth range in string format: [minDepth, maxDepth]
         @return: depth range in string format: [minDepth, maxDepth]
         """
-        if 'depth' not in workingDomain:
-            raise Exception("Can't read depth from workingDomain")
-        depth = workingDomain['depth']
-
         depth_dataset = self.dataset.get_depth(dataset)
+        if depth_dataset is None:
+            print("Dataset: ", dataset, " doesn't have depth attribute")
+            return None
+        depth = workingDomain['depth']
         depth_dataset.sort()
 
         if depth[0] > min(depth_dataset):

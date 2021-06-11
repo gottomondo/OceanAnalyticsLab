@@ -38,8 +38,5 @@ To launch the tools simpy run the command:
 - `python mockup.py MEDSEA_STHUB` -> download from StorageHub
 
 - `python GLOBAL_ANALYSIS_FORECAST_PHY_001_024` -> download **global** dataset from WEkEO
-
-
-
-
-
+  
+- `python OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041`
