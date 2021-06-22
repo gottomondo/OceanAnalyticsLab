@@ -1,5 +1,6 @@
 from download.strategy import InputStrategy
 from download.wekeo import dataset_access as db
+import copy
 
 
 def binary_search(elements, value, mode: int):
@@ -61,7 +62,7 @@ class InHDA(InputStrategy):
         if depth_dataset is None:
             print("Dataset: ", dataset, " doesn't have depth attribute")
             return None
-        depth = workingDomain['depth']
+        depth = copy.deepcopy(workingDomain['depth'])
         depth_dataset.sort()
 
         if depth[0] > min(depth_dataset):
