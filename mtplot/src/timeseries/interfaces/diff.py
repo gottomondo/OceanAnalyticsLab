@@ -2,20 +2,20 @@
 
 from netCDF4 import Dataset
 
-import plot.lib.netcdf as nclib
-import plot.lib.util as utillib
-from plot.timeseries import template
+import mtplot.lib.netcdf as nclib
+import mtplot.lib.util as utillib
+from mtplot.src.timeseries import template
 
 
 def diff_plot(inputFile1, inputFile2, var, title, tDescr, xTicksMax, outFileName, freq, yLim=None):
     """
     This function compute the diff for variable computed as: field = inputFile2.variable - inputFile1.variable,
-    then call the plot function for the new field variable
+    then call the src function for the new field variable
 
     Args:
         inputFile1: first netCDF file path
         inputFile2: second netCDF file path
-        var: variable to plot
+        var: variable to src
         title: if not None this will be the figure title
         tDescr: figure title extension if title is None
         xTicksMax: number of thick on x axis

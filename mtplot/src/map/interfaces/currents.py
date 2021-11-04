@@ -2,17 +2,17 @@
 
 import numpy as np
 
-import plot.lib.netcdf as nclib
-import plot.lib.util as utillib
+import mtplot.lib.netcdf as nclib
+import mtplot.lib.util as utillib
 from netCDF4 import Dataset
-from plot.map import template
+from mtplot.src.map import template
 
 
 def get_current_component(ncVar, depthLevel, qd):
     """
     This functions get a curr component from netCDF file and remove from it
     the unnecessary dimensions and set some points to nan in according to qd value.
-    In this way there won't be too many quivers to plot in the map
+    In this way there won't be too many quivers to src in the map
 
     Args:
         ncVar: current component
@@ -76,7 +76,7 @@ def get_current(cur_u, cur_v):
 def currents_plot(inputFile, inputFile2, var, var2, depthLevel, title,
                   tDescr, lonLat, outFileName, mapLevels, qd, grid, qScale, qWidth, clbLim=None):
     """
-    This function setting up the current variable to plot
+    This function setting up the current variable to src
 
     Args:
         inputFile: netCDF file path
@@ -86,7 +86,7 @@ def currents_plot(inputFile, inputFile2, var, var2, depthLevel, title,
         depthLevel (int): depth level of var
         title (str): if not None this will be the figure title
         tDescr (str): figure title extension if title is None
-        lonLat (list): the coordinates of the map to plot
+        lonLat (list): the coordinates of the map to src
         outFileName (str): if not None this will be the output file name
         mapLevels (int): number of color to use in the colorbar
         qd (int): the distance in terms of var matrix points between the quivers

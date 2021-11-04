@@ -1,21 +1,21 @@
 #! /usr/bin/env python
-import plot.lib.netcdf as nclib
-import plot.lib.util as utillib
+import mtplot.lib.netcdf as nclib
+import mtplot.lib.util as utillib
 from netCDF4 import Dataset
-from plot.map import template
+from mtplot.src.map import template
 
 
 def standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName, mapLevels, clbLim=None):
     """
-    This function call the function to plot the variable passed as argument
+    This function call the function to src the variable passed as argument
 
     Args:
         inputFile: netCDF file path
-        var: variable to plot
+        var: variable to src
         depthLevel: depth level of var
         title: if not None this will be the figure title
         tDescr: figure title extension if title is None
-        lonLat: the coordinates of the map to plot
+        lonLat: the coordinates of the map to src
         outFileName: if not None this will be the output file name
         mapLevels: number of color to use in the colorbar
         clbLim (str): the range limit of colorbar

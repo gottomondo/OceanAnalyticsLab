@@ -37,11 +37,11 @@ class MapPlot:
                  curr=False,
                  grid=None,
                  qScale=None,
-                 qWidth=None):  # it defines the precision of diff plot     -> Define the precision of diff plot
-        self.mapLevels = mapLevels  # it defines the precision of plot          -> Define the precision of plot
+                 qWidth=None):  # it defines the precision of diff src     -> Define the precision of diff src
+        self.mapLevels = mapLevels  # it defines the precision of src          -> Define the precision of src
         self.xStep = 10 if xStep is None else xStep  # x coordinates step grid
         self.yStep = 5 if yStep is None else yStep  # y coordinates step grid
-        self.round_factor = 4 if round_factor is None else round_factor  # it defines the precision of diff plot     -> Define the precision of diff plot
+        self.round_factor = 4 if round_factor is None else round_factor  # it defines the precision of diff src     -> Define the precision of diff src
         self.cmap = 'viridis' if cmap is None else cmap
         self.diff = diff
         self.curr = curr
@@ -72,10 +72,10 @@ class MapPlot:
 
     def get_contourf_levels(self, minp, maxp, clbLim=None):
         """
-        This function defines how many values plot on the map.
+        This function defines how many values src on the map.
         The higher the number of levels the more accurate the map will be
         and the longer the computation time will be. It computes a value range that
-        differ in case of differ plot ( in this case the plot is centered to 0 ).
+        differ in case of differ src ( in this case the src is centered to 0 ).
         Change round_factor and contourf_round_factor to increase or decrease the map precision
 
         Args:
@@ -85,7 +85,7 @@ class MapPlot:
 
         Returns:
             ndarray: an array with values in the range [minp, maxp] in standard case,
-                in case of diff plot it return a range [-cbarLim, cbarLim], cbarLim = max(|minp|, |maxp|)
+                in case of diff src it return a range [-cbarLim, cbarLim], cbarLim = max(|minp|, |maxp|)
 
         """
 
@@ -127,8 +127,8 @@ class MapPlot:
         Args:
             lon: longitude of wrk
             lat: latitude of wrk
-            wrk: variable to plot
-            title: plot title
+            wrk: variable to src
+            title: src title
             out_name: name of outfile
             lonLat: longitude and latitude of the figure
             curr_u: u component of current
@@ -136,7 +136,7 @@ class MapPlot:
             clbLim (str): the range limit of colorbar
 
         Returns:
-            file: save a png map plot
+            file: save a png map src
 
         """
         figSize = get_fig_size(lonLat)

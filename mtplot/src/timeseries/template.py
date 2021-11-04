@@ -4,7 +4,7 @@ import matplotlib.dates as mdates
 import datetime
 import pandas as pd
 
-import plot.lib.LinearRegression as lr
+import mtplot.lib.LinearRegression as lr
 
 
 class TimeSeriesPlot:
@@ -31,18 +31,22 @@ class TimeSeriesPlot:
 
         """
         if self.nc_time is None:  # Climatology case
-            # the year is not consider in the climatology timeseries plot
+            # the year is not consider in the climatology timeseries src
             start_date = datetime.datetime(1990, 1, 1)
             end_date = datetime.datetime(1990, 12, 1)
             date_range = pd.date_range(start=start_date, end=end_date, freq='MS')
         else:
             # force date to first day otherwise python can discard the first year in annual timeseries
-            start_date = datetime.datetime(self.nc_time[0].year, 1, 1) if 'Y' in self.freq else self.nc_time[0]
-            end_date = self.nc_time[-1]
+            if 'Y' in self.freq:
+                start_date = datetime.datetime(self.nc_time[0].year, 1, 1)
+            elif 'M' in self.freq:
+                start_date = datetime.datetime(self.nc_time[0].year, self.nc_time[0].month, 1)
+            elif 'D' in self.freq:
+                start_date = datetime.datetime(self.nc_time[0].year, self.nc_time[0].month, self.nc_time[0].day)
+            else:
+                raise Exception("Time frequency unknown")
 
-            if 'M' in self.freq:
-                start_date = start_date.replace(day=1)
-                end_date = end_date.replace(day=1)
+            end_date = self.nc_time[-1]
 
             date_range = pd.date_range(start=start_date, end=end_date, freq=self.freq)
 
@@ -83,7 +87,7 @@ class TimeSeriesPlot:
     def plot(self, nc_var, title, out_name, linearRegression=False):
         if nc_var.size == 0:
             nc_var = [np.nan] * len(self.plot_dates)
-            title = "No Data available to plot"
+            title = "No Data available to src"
         fig = plt.figure(1, figsize=(20, 9), dpi=300)
         ax = fig.add_subplot(111)
         if self.yLim is not None:
@@ -102,7 +106,7 @@ class TimeSeriesPlot:
 
             # figJ = plt.figure(2, figsize=(20, 9), dpi=300)
             # ax_J = figJ.add_subplot(111)
-            # ax_J.plot(J, c='b')
+            # ax_J.src(J, c='b')
             # plt.title('Cost function')
             # plt.xlabel('iteration')
             # plt.ylabel('J')
@@ -136,6 +140,6 @@ class TimeSeriesPlot:
 
         # ticks rotation
         fig.autofmt_xdate()
-        # save plot
+        # save src
         plt.savefig(out_name)
         plt.close()

@@ -2,7 +2,7 @@ import datetime
 
 import numpy as np
 
-from plot.lib.time import get_date_from_timedelta
+from mtplot.lib.time import get_date_from_timedelta
 from netCDF4 import Dataset
 
 ts_tuple = (1,)
@@ -36,8 +36,8 @@ def get_clim_timerange(ncDataset):
 
 def get_map_field(nc_variable, depthLevel):
     """
-    This function masks all value equal to 0 ( the land in standard plot
-    and land + area with no error in diff plot ) if the file isn't masked,
+    This function masks all value equal to 0 ( the land in standard src
+    and land + area with no error in diff src ) if the file isn't masked,
     then extract the selected depth level of variable if more then one is present
 
     Args:
@@ -67,7 +67,7 @@ def read_dim_var(nc_dataset, lonLat=None, depthLevel=None):
 
     Args:
         nc_dataset: input netcdf dataset
-        lonLat (list): the coordinates of the map to plot
+        lonLat (list): the coordinates of the map to src
         depthLevel (int): depth level of var to read
 
     Returns:

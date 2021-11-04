@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
-import plot.lib.netcdf as nclib
-import plot.lib.util as utillib
+import mtplot.lib.netcdf as nclib
+import mtplot.lib.util as utillib
 from netCDF4 import Dataset
-from plot.map import template
+from mtplot.src.map import template
 import numpy as np
 
 
@@ -90,16 +90,16 @@ def diff_plot(inputFile, inputFile2, var, depthLevel, title, tDescr, lonLat, out
               diffForce=False, clbLim=None):
     """
     This function compute the diff for variable computed as: field = inputFile2.variable - inputFile.variable,
-    then call the plot function for the new field variable
+    then call the src function for the new field variable
 
     Args:
         inputFile: first netCDF file path
         inputFile2: second netCDF file path
-        var: variable to plot
+        var: variable to src
         depthLevel: depth level of var
         title: if not None this will be the figure title
         tDescr: figure title extension if title is None
-        lonLat: the coordinates of the map to plot
+        lonLat: the coordinates of the map to src
         outFileName: if not None this will be the output file name
         mapLevels: number of color to use in the colorbar
         diffMask (bool): enable plotting mask difference instead of var difference

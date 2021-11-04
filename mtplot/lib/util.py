@@ -1,4 +1,4 @@
-from plot.lib.netcdf import name_dict
+from mtplot.lib.netcdf import name_dict
 
 
 def get_depth_string(depth_bnds):
@@ -25,7 +25,7 @@ def get_out_name(var, descr, level=None, depth_field=None):
     """
 
     Args:
-        var: variable to plot
+        var: variable to src
         descr (str): additional output file name string passed as argument
         level (int): depth level of var
         depth_field (str): the depth range
@@ -49,7 +49,7 @@ def get_map_title(var, level, descr, diff=False, curr=False):
     This functions constructs a default title for the map figure
 
     Args:
-        var: variable to plot
+        var: variable to src
         level (int): depth level of var
         descr (str): additional title description passed as argument
         diff (bool): enable diff title
@@ -76,8 +76,8 @@ def get_ts_title(var, plot_dates, descr, depth_field, diff=False, clim=False, ti
     This functions constructs a default title for the timeseries figure
 
     Args:
-        var (str): variable to plot
-        plot_dates (list): dates to plot
+        var (str): variable to src
+        plot_dates (list): dates to src
         descr (str): additional title description passed as argument
         depth_field (list): the depth range
         diff (bool): enable diff title
@@ -110,8 +110,8 @@ def get_date_title(plot_dates, clim, time_range="", freq=None):
     in according to timeseries frequency
 
     Args:
-        plot_dates (list): dates to plot
-        clim (bool): if True it activate climatology plot
+        plot_dates (list): dates to src
+        clim (bool): if True it activate climatology src
         time_range (str): the years range  (climatology case)
         freq (str): plot_dates frequency
 

@@ -2,20 +2,20 @@
 
 from netCDF4 import Dataset
 
-import plot.lib.netcdf as nclib
-import plot.lib.util as utillib
-from plot.timeseries import template
+import mtplot.lib.netcdf as nclib
+import mtplot.lib.util as utillib
+from mtplot.src.timeseries import template
 
 
 def climatology_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, yLim=None):
     """
     This function reads from file the variable indicated, then call the function
-    in order to generate a climatology timeseries plot, where on x axis there are
+    in order to generate a climatology timeseries src, where on x axis there are
     only the month name as label
 
     Args:
         inputFile: netCDF file path
-        var: variable to plot
+        var: variable to src
         title: if not None this will be the figure title
         tDescr: figure title extension if title is None
         xTicksMax: number of thick on x axis
