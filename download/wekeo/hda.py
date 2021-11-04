@@ -47,8 +47,7 @@ class HDA(DownloadStrategy):
             self.bluecoud_proxy = False
         self.api_key = api_key
         print('Your API key is: ' + self.api_key)
-        if outdir is None:
-            self.outdir = utils.init_dl_dir()
+        self.outdir = utils.init_dl_dir(outdir)
 
         ##### hda_init initialization #####
         self.hdaInit = dict()
@@ -95,7 +94,7 @@ class HDA(DownloadStrategy):
             self.hdaInit['download_dir_path'] = download_dir_path
             self.hda = hdaf.init(dataset_id, self.api_key, download_dir_path)
 
-    def download(self, dataset, working_domain, fields, in_memory=False):
+    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True):
         """
         This function allow to download from HDA service the needed file to compute the fieldType in the
         specified space and time domain.
@@ -103,6 +102,7 @@ class HDA(DownloadStrategy):
 
         @param in_memory: if True the function return a netCDF4.Dataset in memory.
             NOTE: if select True, the file will be not masked
+        @param rm_file: if True the downloaded files will be deleted once they are loaded into memory
         @param dataset: source dataset
         @param working_domain: dict with
             lonLat: list of float with the template: [minLon, minLat, maxLon, maxLat]
@@ -176,6 +176,8 @@ class HDA(DownloadStrategy):
                                           dl_status=False)
 
             nc_files.append(netCDF4.Dataset(nc_filename + '.nc', mode='r'))
+            if rm_file:
+                os.remove(nc_filename + '.nc')
         # nc_file is useful when call download using string_template, in this case you need
         # to know the path and the name of the single file that will be downloaded
         return nc_files

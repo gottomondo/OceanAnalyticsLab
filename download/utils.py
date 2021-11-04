@@ -42,14 +42,16 @@ def get_type_file(field):
     return type_file
 
 
-def init_dl_dir():
+def init_dl_dir(outdir=None):
     """
     If not exists, create the download dir
     @return: the path of default download directory
     """
     import os
+
+    if outdir is None:
+        outdir = os.path.dirname(__file__).split('download')[0] + '/indir'
     # create new dir called 'indir' in the parent directory of daccess module
-    outdir = os.path.dirname(__file__).split('download')[0] + '/indir'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
     return outdir

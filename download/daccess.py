@@ -53,8 +53,7 @@ def float_int_check(elements):
 
 
 class Daccess:
-    def __init__(self, dataset: str, fields: list, outDir=None, hdaKey="",
-                 dirID="eba166b2-c182-4dde-a2ce-b9bdf7f9edf3"):
+    def __init__(self, dataset: str, fields: list, outDir=None, hdaKey=""):
         """
         @param dataset: source dataset
         @param fields: cf standard name used to represent a variable
@@ -64,7 +63,6 @@ class Daccess:
         self.fields = fields
         self.outDir = outDir
         self.hdaKey = hdaKey
-        self.dirID = dirID
 
         # select the right strategy in according to the selected dataset
         self.dataset = dataset
@@ -88,7 +86,7 @@ class Daccess:
             from download.storagehubfacility import in_sthub, sthub
             print("Downloading from Storage Hub Facility")
             self.icontext = InputContext(in_sthub.InStHub())
-            self.dcontext = DownloadContext(sthub.StHub(self.dirID, self.outDir))
+            self.dcontext = DownloadContext(sthub.StHub(self.dataset, self.outDir))
         else:
             raise Exception('Infrastructure: ' + self._infrastructure + ' not supported')
 

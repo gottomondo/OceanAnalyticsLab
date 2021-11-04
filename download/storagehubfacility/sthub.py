@@ -30,33 +30,29 @@ def get_filename_from_string_template(string_template):
 
 
 class StHub(DownloadStrategy):
-    def __init__(self, dirID: str, outdir=None):
+    def __init__(self, dataset_id, outdir=None):
         """
         @param dirID: id of the directory from which to download data
         @param outdir: directory where store the output
         """
-        if outdir is None:
-            self.outdir = utils.init_dl_dir()
+        self.outdir = utils.init_dl_dir(outdir)
 
-        if len(dirID) == 0:
-            raise Exception("dirID not valid")
-        else:
-            self.dirID = dirID
-
-        self.complete_list = self.load_complete_list()  # list of (id, name_file) pairs
         self.dataset = db.Dataset()
+        self.dir_id = self.dataset.get_dir_id(dataset_id)
+        self.complete_list = self.load_complete_list()  # list of (id, name_file) pairs, it depends from dir_id
 
     def load_complete_list(self):
         print("START ItemChildren")
-        myshfo = sthubf.StorageHubFacility(operation="ItemChildren", ItemId=self.dirID)
+        myshfo = sthubf.StorageHubFacility(operation="ItemChildren", ItemId=self.dir_id)
         myshfo.main()
 
         mobj = json.load(open('outFile'))
         return check_json.get_id(mobj)
 
-    def download(self, dataset, working_domain, fields, in_memory=False):
+    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True):
         """
         @param in_memory: if True the function return a netCDF4.Dataset in memory
+        @param rm_file: if True the downloaded files will be deleted once they are loaded into memory
         @param dataset: source dataset
         @param working_domain: dict with
             lonLat: not used
@@ -89,6 +85,8 @@ class StHub(DownloadStrategy):
                     nc_files.append(nc_file)
                 else:
                     nc_files.append(netCDF4.Dataset(nc_filename, mode='r'))
+                    if rm_file:
+                        os.remove(nc_filename)
 
         return nc_files
 
