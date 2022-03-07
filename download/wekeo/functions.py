@@ -106,14 +106,13 @@ def get_token_from_wekeo(hda_dict):
 
 def get_token_from_bluecloud_proxy():
     from download import utils
-    from requests.auth import HTTPBasicAuth
 
     globalVariablesFile = os.path.dirname(__file__).split('download')[0] + '/globalvariables.csv'
     gcubeToken = utils.get_gcube_token(globalVariablesFile)
 
     hprops = {"Accept": "application/json"}
-    urlString = "https://data.d4science.org/wekeo/gettoken"
-    r = requests.get(urlString, headers=hprops, auth=HTTPBasicAuth("gcube-token", gcubeToken))
+    urlString = "https://data.d4science.org/wekeo/gettoken?gcube-token=" + gcubeToken
+    r = requests.get(urlString, headers=hprops)
     if r.status_code != 200:
         error = "Error in Get Token {} {}".format(r.status_code, r.text)
         print(error)
