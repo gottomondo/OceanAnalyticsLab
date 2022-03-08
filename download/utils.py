@@ -70,7 +70,7 @@ def get_gcube_token(globalVariablesFile):
                 if line.find("gcube_token") != -1:
                     tk = line[14:]
                     gcubeToken = tk.replace('"', '').strip()
-                    print("Found gcube_token")
+                    # print("Found gcube_token")
                     break
     if gcubeToken is None:
         raise Exception('Error gcube_token not found!')

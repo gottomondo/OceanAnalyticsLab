@@ -397,7 +397,7 @@ def downloadFile(url, headers, directory, file_name, total_length=0, dl_status=F
                 pass
         print("File downloaded")
         print("Apply mask to nan value")
-        mask_nc_file(filename=filename)
+        # mask_nc_file(filename=filename)
 
         return time.process_time() - start
 
