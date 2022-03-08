@@ -26,6 +26,18 @@ def get_fig_size(lonLat):
     return x, y
 
 
+def add_unit_to_title(title, unit):
+    title_split = title.split(',')  # title structure: output_field, output_type
+    output_field = title_split[0]
+    output_type = title_split[1] if len(title_split) > 1 else None
+
+    output_field_with_unit = output_field + ' (' + unit + ')'
+    title_with_unit = output_field_with_unit
+    if output_type is not None:
+        title_with_unit += ', ' + output_type
+    return title_with_unit
+
+
 class MapPlot:
     def __init__(self,
                  mapLevels=None,
@@ -118,9 +130,9 @@ class MapPlot:
             # Plot standard map case
             x = self.mapLevels
             contourfLevel = np.round(np.linspace(minp, maxp, int(x), endpoint=True), self.round_factor)
-        return contourfLevel
+        return np.unique(contourfLevel) # this operation can reduce the resolution
 
-    def plot(self, lon, lat, wrk, title, out_name, lonLat, curr_u=None, curr_v=None, clbLim=None):
+    def plot(self, lon, lat, wrk, title, out_name, lonLat, curr_u=None, curr_v=None, clbLim=None, subtitle=None, unit=None):
         """
         Plotting function
 
@@ -172,9 +184,13 @@ class MapPlot:
             maxValue = 0
         cbar.set_label(
             "min: " + np.format_float_positional(minValue) + ", max: " + np.format_float_positional(maxValue),
-            fontsize=12)
+            fontsize=10)
 
-        plt.title(title, fontsize=24, y=1.1)
+        if unit is not None:
+            title = add_unit_to_title(title, unit)
+        plt.suptitle(title, fontsize=20)
+        plt.title(subtitle, y=1.1, fontsize=12)  # used as subtitle
+
         ax.add_feature(cfeature.LAND)
         gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                           linewidth=1, color='grey', alpha=0.5,

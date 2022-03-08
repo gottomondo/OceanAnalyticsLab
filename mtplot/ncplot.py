@@ -25,6 +25,7 @@ def main(raw_args=None):
     grid = args.grid
     mapLevels = args.mapLevels
     clbLim = args.clbLim
+    subtitle = args.subtitle
     # Timeseries only
     freq = args.freq
     xTicks = args.xTicks
@@ -62,7 +63,7 @@ def main(raw_args=None):
                            diffMask, diffForce, clbLim)
         else:
             from mtplot.src.map.interfaces import standard
-            standard.standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName, mapLevels, clbLim)
+            standard.standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName, mapLevels, clbLim, subtitle)
     # ****************************** TIMESERIES PLOT ****************************** #
     elif ts:
         print("Starting timeseries plot...")
@@ -71,10 +72,10 @@ def main(raw_args=None):
             diff.diff_plot(inputFile, inputFile2, var, title, tDescr, xTicks, outFileName, freq, yLim=yLim)
         elif clim:
             from mtplot.src.timeseries.interfaces import climatology
-            climatology.climatology_plot(inputFile, var, title, tDescr, xTicks, outFileName, yLim=yLim)
+            climatology.climatology_plot(inputFile, var, title, tDescr, xTicks, outFileName, yLim=yLim, subtitle=subtitle)
         else:
             from mtplot.src.timeseries.interfaces import standard
-            standard.standard_plot(inputFile, var, title, tDescr, xTicks, outFileName, freq, lr, yLim=yLim)
+            standard.standard_plot(inputFile, var, title, tDescr, xTicks, outFileName, freq, lr, yLim=yLim, subtitle=subtitle)
     else:
         raise Exception('Please select a src mode using --map or --ts')
 
@@ -88,6 +89,7 @@ def get_args(raw_args=None):
     parse.add_argument('inputFile', type=str, help="Path of file")
     parse.add_argument('var', type=str, help="Variable to src")
     parse.add_argument('--title', type=str, default=None, help="Title")
+    parse.add_argument('--subtitle', type=str, default=None, help="Sub Title")
     parse.add_argument('--tDescr', type=str, default=None, help="Title description")
     parse.add_argument('--o', dest="outFileName", type=str, default=None, help="Outfile name")
     # Map only

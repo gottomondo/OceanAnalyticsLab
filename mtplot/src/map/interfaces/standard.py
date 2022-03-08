@@ -5,7 +5,7 @@ from netCDF4 import Dataset
 from mtplot.src.map import template
 
 
-def standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName, mapLevels, clbLim=None):
+def standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName, mapLevels, clbLim=None, subtitle=None):
     """
     This function call the function to src the variable passed as argument
 
@@ -35,4 +35,4 @@ def standard_plot(inputFile, var, depthLevel, title, tDescr, lonLat, outFileName
         outFileName = utillib.get_out_name(var, tDescr, level=depthLevel)
 
     mapPlot = template.MapPlot(mapLevels=mapLevels)
-    mapPlot.plot(ncLon, ncLat, varField, title, outFileName, lonLat, clbLim=clbLim)
+    mapPlot.plot(ncLon, ncLat, varField, title, outFileName, lonLat, clbLim=clbLim, subtitle=subtitle, unit=ncVarUnit)

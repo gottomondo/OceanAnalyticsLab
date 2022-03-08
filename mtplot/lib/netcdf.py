@@ -136,6 +136,11 @@ def find_index(Bnds, Min, Max):
     """
     import sys
 
+    if Min < Bnds[0, 0]:
+        print('WARNING Out of Range: ' + str(Min) + ' < ' + str(Bnds[0, 0]))
+    if Max > Bnds[-1, 1]:
+        print('WARNING Out of Range: ' + str(Max) + ' > ' + str(Bnds[-1, 1]))
+
     iMin = 0
     if Min < Bnds[0, 0]:
         print('WARNING : Lon min chosen is out of range, the lowest value supported will be selected...".',

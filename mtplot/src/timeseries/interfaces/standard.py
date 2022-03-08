@@ -7,7 +7,7 @@ import mtplot.lib.util as utillib
 from mtplot.src.timeseries import template
 
 
-def standard_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, freq, lr=False, yLim=None):
+def standard_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, freq, lr=False, yLim=None, subtitle=None):
     """
     This function reads from file the variable indicated, then call the function
     in order to generate a standard timeseries src
@@ -51,4 +51,4 @@ def standard_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, freq, l
     if outFileName is None:
         outFileName = utillib.get_out_name(var, tDescr, depth_field=depthField)
 
-    timeSeriesPlot.plot(varField, title, outFileName, linearRegression=lr)
+    timeSeriesPlot.plot(varField, title, outFileName, linearRegression=lr, subtitle=subtitle)

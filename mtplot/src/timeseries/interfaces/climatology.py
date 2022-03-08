@@ -7,7 +7,7 @@ import mtplot.lib.util as utillib
 from mtplot.src.timeseries import template
 
 
-def climatology_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, yLim=None):
+def climatology_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, yLim=None, subtitle=None):
     """
     This function reads from file the variable indicated, then call the function
     in order to generate a climatology timeseries src, where on x axis there are
@@ -47,4 +47,4 @@ def climatology_plot(inputFile, var, title, tDescr, xTicksMax, outFileName, yLim
     if outFileName is None:
         outFileName = utillib.get_out_name(var, tDescr, depth_field=depthField)
 
-    timeSeriesPlot.plot(varField, title, outFileName)
+    timeSeriesPlot.plot(varField, title, outFileName, subtitle=subtitle)

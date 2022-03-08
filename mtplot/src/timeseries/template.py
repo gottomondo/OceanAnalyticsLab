@@ -84,7 +84,7 @@ class TimeSeriesPlot:
         # date_fmt = mdates.AutoDateFormatter(date_locator)
         return date_locator, date_fmt
 
-    def plot(self, nc_var, title, out_name, linearRegression=False):
+    def plot(self, nc_var, title, out_name, linearRegression=False, subtitle=None):
         if nc_var.size == 0:
             nc_var = [np.nan] * len(self.plot_dates)
             title = "No Data available to src"
@@ -121,7 +121,8 @@ class TimeSeriesPlot:
         else:
             plt.grid(axis='y')
 
-        plt.title(title, fontsize=20, y=1.05)
+        plt.suptitle(title, fontsize=22)
+        plt.title(subtitle, y=1.05, fontsize=12)  # used as subtitle
         if self.yLabel is not None:
             plt.ylabel(self.yLabel, fontsize=14, fontweight="bold")
 
