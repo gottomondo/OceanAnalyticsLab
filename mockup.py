@@ -7,6 +7,7 @@ import netCDF4
 from tools import json_builder
 from dateutil.tz import tzutc
 from download import daccess
+from mtplot import ncplot
 
 wdir = "./indir"
 
@@ -36,6 +37,13 @@ def clone_nc_dataset(nc_source, nc_dest):
         nc_dest[name][:] = nc_source[name][:]
 
 
+def get_fields(dataset):
+    if dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
+        return ['mass_concentration_of_chlorophyll_a_in_sea_water']
+    else:
+        return ['sea_water_potential_temperature']
+
+
 def main():
     main_start_time = time.time()
     args = get_args()
@@ -44,34 +52,22 @@ def main():
     # ------------ parameter declaration ------------ #
     # direct declaration of parameters, you should able to extract these information from input_parameters
     dataset = args.dataset
-    fields = ['sea_water_potential_temperature']
-    daccess_working_domain = dict()
-    if dataset == "GLOBAL_ANALYSIS_FORECAST_PHY_001_024":
-        daccess_working_domain['time'] = ['2019-01-01T00:00:00', '2019-01-31T00:00:00']
-    elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
-        daccess_working_domain['time'] = ['2020-07-01T00:00:00', '2020-07-31T00:00:00']
-        fields = ['mass_concentration_of_chlorophyll_a_in_sea_water']
-    else:
-        daccess_working_domain['time'] = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
-    daccess_working_domain['depth'] = [10, 100]
-    daccess_working_domain['lonLat'] = [-6, 36.5, 30, 46]
+    fields = get_fields(dataset)
+    var_to_plot = get_var_to_plot(dataset)
+    daccess_working_domain = get_daccess_working_domain(dataset)
 
     # ------------ file download ------------ #
-    print("START MakeInDir")
-    exec_log.add_message("Start Download files")
-    try:
-        start_dl_time = time.time()
-        dcs = daccess.Daccess(dataset, fields)
-        nc_dataset = dcs.download(daccess_working_domain)
-    except Exception as e:
-        print(e, file=sys.stderr)
-        err_log = json_builder.LogError(-1, str(e))
-        error_exit(err_log, exec_log)
-    exec_log.add_message("Complete Download files", time.time() - start_dl_time)
+    nc_dataset = download(daccess_working_domain, dataset, exec_log, fields)
 
+    # move download file in root dir and rename in output.nc
     nc_output = netCDF4.Dataset('output.nc', mode='w')
     clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
     nc_output.close()
+
+    # ------------ plot ------------ #
+    plot_args = ["output.nc", var_to_plot, '--title=' +
+                 ','.join(fields), '--o=output']
+    ncplot.main(plot_args)
 
     # Save info in json file
     exec_log.add_message("Total time: " + " %s seconds " % (time.time() - main_start_time))
@@ -80,6 +76,55 @@ def main():
     json_builder.write_json(error=err_log.__dict__,
                             exec_info=exec_log.__dict__['messages'],
                             end_time=end_time)
+
+
+def download(daccess_working_domain, dataset, exec_log, fields):
+    print("START MakeInDir")
+    exec_log.add_message("Start Download files")
+    nc_dataset = None
+    start_dl_time = time.time()
+    try:
+        dcs = daccess.Daccess(dataset, fields)
+        nc_dataset = dcs.download(daccess_working_domain)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        err_log = json_builder.LogError(-1, str(e))
+        error_exit(err_log, exec_log)
+    exec_log.add_message("Complete Download files", time.time() - start_dl_time)
+    if nc_dataset is None:
+        raise Exception("An error occurs while downloading file")
+    return nc_dataset
+
+
+def get_var_to_plot(dataset):
+    if dataset == "MEDSEA_MULTIYEAR_PHY_006_004_STHUB":
+        var_to_plot = "thetao"
+    elif dataset == "MEDSEA_MULTIYEAR_PHY_006_004":
+        var_to_plot = "thetao"
+    elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
+        var_to_plot = "CHL" # to check
+    else:
+        raise Exception("Dataset unknown: " + dataset)
+    return var_to_plot
+
+
+def get_daccess_working_domain(dataset):
+    daccess_working_domain = dict()
+    daccess_working_domain['time'] = get_time_wd(dataset)
+    daccess_working_domain['depth'] = [10, 100]
+    daccess_working_domain['lonLat'] = [-6, 36.5, 30, 46]
+    return daccess_working_domain
+
+
+def get_time_wd(dataset):
+    if dataset == "MEDSEA_MULTIYEAR_PHY_006_004_STHUB":
+        time_wd = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
+    elif dataset == "MEDSEA_MULTIYEAR_PHY_006_004":
+        time_wd = ['2000-01-01T00:00:00', '2000-01-31T00:00:00']
+    elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
+        time_wd = ['2020-07-01T00:00:00', '2020-07-31T00:00:00']
+
+    return time_wd
 
 
 def error_exit(err_log, exec_log):
