@@ -183,8 +183,15 @@ def filter_dataset(file_list, working_domain, file_types):
         for file_type in file_types:
             if file_type in file[1]:
                 for t in time:
-                    if t + '01_m' in file[1] or t + '.nc' in file[1]:  # med or glo
-                        filtered_list.append(file)
-                        break
+                    if t + '01_m' in file[1]:   # med pattern: YYYYMM01_m*
+                        if file not in filtered_list:
+                            filtered_list.append(file)
+                    elif t + '.nc' in file[1]:  # glo pattern: *_YYYYMM.nc
+                        if file not in filtered_list:
+                            filtered_list.append(file)
+                    elif t in file[1]:
+                        if file not in filtered_list:   # wind dataset pattern: *YYYYMM_YYYYMM.nc
+                            filtered_list.append(file)
+                    break
 
     return filtered_list

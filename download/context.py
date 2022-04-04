@@ -32,7 +32,7 @@ class DownloadContext:
 
         self._strategy = strategy
 
-    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True, max_attempt=5):
+    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=False, max_attempt=5):
         return self._strategy.download(dataset, working_domain, fields, in_memory, rm_file, max_attempt=max_attempt)
 
 
