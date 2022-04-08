@@ -38,6 +38,21 @@ def get_filename_from_string_template(string_template):
     return get_outfile(field[0], time)
 
 
+def load_file_from_filesystem(output_file, return_type):
+    import netCDF4
+
+    if not os.path.exists(output_file):
+        raise Exception("ERROR Can't load {}: it doesn't exists on filesystem".format(output_file))
+
+    if return_type == "netCDF4":  # if downloaded previously and rm_file == False
+        nc_file = netCDF4.Dataset(output_file, mode='r')
+    elif return_type == "str":
+        nc_file = output_file
+    else:
+        raise Exception("Return type '{}' unknown".format(return_type))
+    return nc_file
+
+
 class HDA(DownloadStrategy):
     def __init__(self, api_key: str, outdir=None):
         """
@@ -124,7 +139,7 @@ class HDA(DownloadStrategy):
         nc_files = list()
         for dataset_field, variables_outfile in map_dataset_with_variables_and_outfile.items():
             nc_file = self.get_file_from_hda(dataset, dataset_field, variables_outfile, in_memory, rm_file,
-                                             max_attempt, working_domain)
+                                             max_attempt, working_domain, return_type)
             nc_files.append(nc_file)
 
         # nc_file is useful when call download using string_template, in this case you need
@@ -151,7 +166,7 @@ class HDA(DownloadStrategy):
         return map_dataset_with_variables_and_outfile
 
     def get_file_from_hda(self, dataset, dataset_field, variables_outfile, in_memory, rm_file, max_attempt,
-                          working_domain):
+                          working_domain, return_type):
         lonLat = working_domain['lonLat']
         depth = working_domain['depth']
         time = working_domain['time']
@@ -159,19 +174,20 @@ class HDA(DownloadStrategy):
 
         output_file = self.outdir + '/' + outfile + '.nc'
         if os.path.exists(output_file):
-            nc_file = netCDF4.Dataset(output_file, mode='r')
+            nc_file = load_file_from_filesystem(output_file, return_type)
         else:
             variables_to_download = variables_outfile['variables']
             dataset_id = self.dataset.get_dataset_id(dataset, dataset_field)
             data_json_request = self.dataset.get_data(dataset, dataset_field, variables_to_download, lonLat, depth,
                                                       time)
-            nc_file = self.download_from_hda(dataset_id, data_json_request, output_file, in_memory, max_attempt)
+            nc_file = self.download_from_hda(dataset_id, data_json_request, output_file, in_memory, max_attempt,
+                                             return_type)
         if rm_file:
             rm(output_file)
 
         return nc_file
 
-    def download_from_hda(self, dataset_id, data, output_file, in_memory, max_attempt):
+    def download_from_hda(self, dataset_id, data, output_file, in_memory, max_attempt, return_type):
         attempt = 0
         file_is_downloaded = False
         nc_file = None
@@ -195,7 +211,7 @@ class HDA(DownloadStrategy):
 
                 hdaf.download_data(hda_dict, user_filename=output_file, in_memory=in_memory,
                                    dl_status=False)
-                nc_file = netCDF4.Dataset(output_file, mode='r')
+                nc_file = load_file_from_filesystem(output_file, return_type)
                 file_is_downloaded = True
             except Exception as e:
                 import sys

@@ -63,18 +63,18 @@ def download_from_sthub(file_to_download, output_file, in_memory, max_attempt, d
             # in_memory false as default -> the file is written on disk as output_file
             nc_file = myshfo.main(in_memory=in_memory, dl_status=dl_status)     # return None if in_memory == False
             if not in_memory:  # need to load manually the file if in_memory is False
-                nc_file = load_file_from_disk(output_file, return_type)
+                nc_file = load_file_from_filesystem(output_file, return_type)
             file_is_downloaded = True
-
         except Exception as e:
             import sys
             print(e, file=sys.stderr)
             attempt += 1
             handle_network_error(output_file, attempt, max_attempt)
+
     return nc_file
 
 
-def load_file_from_disk(output_file, return_type):
+def load_file_from_filesystem(output_file, return_type):
     import netCDF4
 
     if not os.path.exists(output_file):
@@ -148,7 +148,7 @@ class StHub(DownloadStrategy):
                                       dl_status=False):
         output_file = self.get_output_file(file_to_download)    # path of output file on disk
         if os.path.exists(output_file):
-            nc_file = load_file_from_disk(output_file, return_type)
+            nc_file = load_file_from_filesystem(output_file, return_type)
         else:
             nc_file = download_from_sthub(file_to_download, output_file, in_memory, max_attempt, dl_status, return_type)
 
