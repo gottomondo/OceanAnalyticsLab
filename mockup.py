@@ -82,22 +82,21 @@ def main():
     nc_dataset = download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type)
 
     # move download file in root dir and rename in output.nc
-    nc_output = netCDF4.Dataset('output.nc', mode='w')
-    clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
-    nc_output.close()
+    if return_type == "netCDF4":
+        nc_output = netCDF4.Dataset('output.nc', mode='w')
+        clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
+        nc_output.close()
 
     # ------------ plot ------------ #
-    plot_args = ["output.nc", var_to_plot, '--title=' +
-                 ','.join(fields), '--o=output']
-    ncplot.main(plot_args)
+    if dataset != "C3S_ERA5_MEDSEA_1979_2020_STHUB":    # unable to plot this datasource as is original
+        plot_args = ["output.nc", var_to_plot, '--title=' + ','.join(fields), '--o=output']
+        ncplot.main(plot_args)
 
-    # Save info in json file
-    exec_log.add_message("Total time: " + " %s seconds " % (time.time() - main_start_time))
-    err_log = json_builder.LogError(0, "Execution Done")
-    end_time = get_iso_timestamp()
-    json_builder.write_json(error=err_log.__dict__,
-                            exec_info=exec_log.__dict__['messages'],
-                            end_time=end_time)
+        # Save info in json file
+        exec_log.add_message("Total time: " + " %s seconds " % (time.time() - main_start_time))
+        err_log = json_builder.LogError(0, "Execution Done")
+        end_time = get_iso_timestamp()
+        json_builder.write_json(error=err_log.__dict__, exec_info=exec_log.__dict__['messages'], end_time=end_time)
 
 
 def download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type):
