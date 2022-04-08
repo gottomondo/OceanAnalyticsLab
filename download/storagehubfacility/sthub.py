@@ -2,7 +2,7 @@ import sys
 import time
 
 from download.storagehubfacility import storagehubfacility as sthubf, check_json
-from download.strategy import DownloadStrategy
+from download.interface.idownload import DownloadStrategy
 from download.storagehubfacility import dataset_access as db
 import json
 from download import utils

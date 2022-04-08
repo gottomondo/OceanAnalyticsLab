@@ -1,7 +1,7 @@
 import warnings
 import os
 from download.wekeo import functions as hdaf, dataset_access as db
-from download.strategy import DownloadStrategy
+from download.interface.idownload import DownloadStrategy
 import time
 from download import utils
 import netCDF4

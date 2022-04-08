@@ -1,4 +1,4 @@
-from download.strategy import InputStrategy
+from download.interface.iinput import InputStrategy
 
 
 # depth information is not necessary
