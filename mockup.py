@@ -55,6 +55,15 @@ def get_time_frequency(dataset):
     return time_freq
 
 
+def get_return_type(dataset):
+    if dataset == "C3S_ERA5_MEDSEA_1979_2020_STHUB":
+        return_type = "str"
+    else:
+        return_type = "netCDF4"
+
+    return return_type
+
+
 def main():
     main_start_time = time.time()
     args = get_args()
@@ -67,9 +76,10 @@ def main():
     var_to_plot = get_var_to_plot(dataset)
     daccess_working_domain = get_daccess_working_domain(dataset)
     time_freq = get_time_frequency(dataset)
+    return_type = get_return_type(dataset)
 
     # ------------ file download ------------ #
-    nc_dataset = download(daccess_working_domain, dataset, exec_log, fields, time_freq)
+    nc_dataset = download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type)
 
     # move download file in root dir and rename in output.nc
     nc_output = netCDF4.Dataset('output.nc', mode='w')
@@ -90,13 +100,13 @@ def main():
                             end_time=end_time)
 
 
-def download(daccess_working_domain, dataset, exec_log, fields, time_freq):
+def download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type):
     print("START MakeInDir")
     exec_log.add_message("Start Download files")
     nc_dataset = None
     start_dl_time = time.time()
     try:
-        dcs = daccess.Daccess(dataset, fields, time_freq=time_freq)
+        dcs = daccess.Daccess(dataset, fields, time_freq=time_freq, return_type=return_type)
         nc_dataset = dcs.download(daccess_working_domain)
     except Exception as e:
         print(e, file=sys.stderr)
@@ -114,7 +124,7 @@ def get_var_to_plot(dataset):
     elif dataset == "MEDSEA_MULTIYEAR_PHY_006_004":
         var_to_plot = "thetao"
     elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
-        var_to_plot = "CHL" # to check
+        var_to_plot = "CHL"  # to check
     elif dataset == "C3S_ERA5_MEDSEA_1979_2020_STHUB":
         var_to_plot = 'ssi'
     else:
@@ -132,12 +142,14 @@ def get_daccess_working_domain(dataset):
 
 def get_time_wd(dataset):
     if dataset == "MEDSEA_MULTIYEAR_PHY_006_004_STHUB":
-        time_wd = ['1987-01-01T00:00:00', '1987-01-31T00:00:00']
+        time_wd = ['1987-01-01T00:00:00', '1987-02-31T00:00:00']
     elif dataset == "MEDSEA_MULTIYEAR_PHY_006_004":
         time_wd = ['2000-01-01T00:00:00', '2000-01-31T00:00:00']
     elif dataset == "OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041":
         time_wd = ['2020-07-01T00:00:00', '2020-07-31T00:00:00']
     elif dataset == "C3S_ERA5_MEDSEA_1979_2020_STHUB":
+        # must be present a match between the date indicated in the
+        # time range and the date in the filename to download
         time_wd = ['1979-01-01T00:00:00', '2021-01-31T00:00:00']
 
     return time_wd

@@ -102,7 +102,8 @@ class HDA(DownloadStrategy):
             self.hdaInit['download_dir_path'] = download_dir_path
             self.hda = hdaf.init(dataset_id, self.api_key, download_dir_path)
 
-    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True, max_attempt=5):
+    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True, max_attempt=5,
+                 return_type="netCDF4"):
         """
         @param in_memory: if True the function return a netCDF4.Dataset in memory.
             NOTE: if select True, the file will be not masked

@@ -53,16 +53,18 @@ def float_int_check(elements):
 
 
 class Daccess:
-    def __init__(self, dataset: str, fields: list, outDir=None, hdaKey="", time_freq="m"):
+    def __init__(self, dataset: str, fields: list, outDir=None, hdaKey="", time_freq="m", return_type="netCDF4"):
         """
         @param dataset: source dataset
         @param fields: cf standard name used to represent a variable
         @param outDir: output directory
         @param hdaKey: key to access to hda service, leave "" if you want to use bluecloud proxy
+        @param return_type: if netCDF4 return a netCDF4.Dataset, if str return the output filename
         """
         self.fields = fields
         self.outDir = outDir
         self.hdaKey = hdaKey
+        self.return_type = return_type
 
         # select the right strategy in according to the selected dataset
         self.dataset = dataset
@@ -102,4 +104,4 @@ class Daccess:
         wd_validation(daccess_working_domain)
         # fix the working_domain format in according to the selected download strategy
         working_domain = self.icontext.get_wd(daccess_working_domain, self.dataset)
-        return self.dcontext.download(self.dataset, working_domain, self.fields)
+        return self.dcontext.download(self.dataset, working_domain, self.fields, self.return_type)
