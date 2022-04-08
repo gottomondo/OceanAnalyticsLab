@@ -22,7 +22,7 @@ def get_infrastructure(dataset):
 
 
 class Daccess:
-    def __init__(self, dataset: str, fields: list, output_dir=None, hda_key="", time_freq="m", return_type="netCDF4"):
+    def __init__(self, dataset: str, fields: list, output_dir=None, hda_key="", time_freq="m"):
         """
         @param dataset: source dataset
         @param fields: cf standard name used to represent a variable
@@ -33,7 +33,6 @@ class Daccess:
         self.fields = fields
         self.outDir = output_dir
         self.hdaKey = hda_key
-        self.return_type = return_type
 
         # select the right strategy in according to the selected dataset
         self.dataset = dataset
@@ -51,7 +50,7 @@ class Daccess:
         else:
             raise Exception('Infrastructure: ' + self._infrastructure + ' not supported')
 
-    def download(self, daccess_working_domain: dict):
+    def download(self, daccess_working_domain: dict, **kwargs):
         """
         @param daccess_working_domain: dict with spatial/time information:
                 lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
@@ -63,7 +62,7 @@ class Daccess:
         wd_validation(daccess_working_domain)
         # fix the working_domain format in according to the selected download strategy
         working_domain = self.input_ctx.get_wd(daccess_working_domain, self.dataset)
-        return self.download_ctx.download(self.dataset, working_domain, self.fields, return_type=self.return_type)
+        return self.download_ctx.download(self.dataset, working_domain, self.fields, **kwargs)
 
 
 def wd_validation(workingDomain):
