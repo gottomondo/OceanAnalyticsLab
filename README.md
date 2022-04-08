@@ -38,3 +38,5 @@ To launch the tools simpy run the command:
 - `python mockup.py MEDSEA_MULTIYEAR_PHY_006_004_STHUB` -> download from StorageHub
 
 - `python OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041` -> download from WEkEO
+
+- `python C3S_ERA5_MEDSEA_1979_2020_STHUB` -> download from StorageHub (plot is not produced)
