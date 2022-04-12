@@ -106,7 +106,7 @@ def download(daccess_working_domain, dataset, exec_log, fields, time_freq, retur
     start_dl_time = time.time()
     try:
         dcs = daccess.Daccess(dataset, fields, time_freq=time_freq)
-        nc_dataset = dcs.download(daccess_working_domain, return_type=return_type)
+        nc_dataset = dcs.download(daccess_working_domain, return_type=return_type, rm_file=False)
     except Exception as e:
         print(e, file=sys.stderr)
         err_log = json_builder.LogError(-1, str(e))
