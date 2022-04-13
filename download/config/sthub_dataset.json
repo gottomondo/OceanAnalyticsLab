@@ -1,4 +1,18 @@
 {
+    "C3S_ERA5_MEDSEA_1979_2020_STHUB": {
+        "dir_id": "388955aa-8db7-4a0b-8faa-a1ccd16ee848",
+        "dataset_variable": {
+            "WIND": ["wind"]
+        },
+        "cf-standard-name_variable": {
+            "wind_speed": [
+                "wind"
+            ]
+        },
+        "lon_coverage": [-6, 36],
+        "lat_coverage": [30, 46],
+        "time": ["1987-01", "1989-12"]
+    },
     "MEDSEA_MULTIYEAR_PHY_006_004_116_STHUB": {
         "dir_id": "eba166b2-c182-4dde-a2ce-b9bdf7f9edf3",
         "dataset_variable": {

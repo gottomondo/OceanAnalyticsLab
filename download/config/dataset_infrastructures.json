@@ -2,6 +2,9 @@
     "MEDSEA_MULTIYEAR_PHY_006_004": {
         "infrastructure": "WEKEO"
     },
+    "C3S_ERA5_MEDSEA_1979_2020_STHUB": {
+        "infrastructure": "STHUB"
+    },
     "MEDSEA_MULTIYEAR_PHY_006_004_STHUB": {
         "infrastructure": "STHUB"
     },
