@@ -33,10 +33,10 @@ to download your dataset from StorageHub
 To launch the tools simpy run the command:
 
 
-- `python mockup.py MEDSEA_MULTIYEAR_PHY_006_004` -> download from WEkEO
+- `python mockup.py "{ 'id_output_type': 'mockup', 'id_field': 'sea_water_potential_temperature', 'data_source': ['MEDSEA_MULTIYEAR_PHY_006_004'], 'working_domain': { 'box': [[-6, 30.15625, 36.28125, 45.96875]], 'depth_layers': [[1.472102, 5334.648]] }, 'start_time': '1987-01', 'end_time': '1987-01' }"` -> download from WEkEO
 
-- `python mockup.py MEDSEA_MULTIYEAR_PHY_006_004_STHUB` -> download from StorageHub
+- `python mockup.py "{ 'id_output_type': 'mockup', 'id_field': 'sea_water_potential_temperature', 'data_source': ['MEDSEA_MULTIYEAR_PHY_006_004_STHUB'], 'working_domain': { 'box': [[-6, 30.15625, 36.28125, 45.96875]], 'depth_layers': [[1.472102, 5334.648]] }, 'start_time': '1987-01', 'end_time': '1987-01' }"` -> download from StorageHub
 
-- `python mockup.py OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041` -> download from WEkEO
+- `python mockup.py "{ 'id_output_type': 'mockup', 'id_field': 'mass_concentration_of_chlorophyll_a_in_sea_water', 'data_source': ['OCEANCOLOUR_MED_CHL_L4_NRT_OBSERVATIONS_009_041'], 'working_domain': {'box': [[-6,30.15625,36.28125,45.96875]], 'depth_layers': [[1.472102,5334.648]]}, 'start_time': '2020-07', 'end_time': '2020-07'}"` -> download from WEkEO
 
-- `python mockup.py C3S_ERA5_MEDSEA_1979_2020_STHUB` -> download from StorageHub (plot is not produced)
+- `python mockup.py "{ 'id_output_type': 'mockup', 'id_field': 'wind_speed', 'data_source': ['C3S_ERA5_MEDSEA_1979_2020_STHUB'], 'working_domain': { 'box': [[-6, 30.15625, 36.28125, 45.96875]], 'depth_layers': [[1.472102, 5334.648]] }, 'start_time': '1979-01-01', 'end_time': '2021-01-31' }"` -> download from StorageHub (plot is not produced)
