@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import sys
-import time
 import datetime
 import netCDF4
-from tools import json_builder
+import traceback
+
+from log.logmng import LogMng
 from dateutil.tz import tzutc
 from download import daccess
 from mtplot import ncplot
@@ -16,7 +16,6 @@ def get_args():
     import argparse
 
     parse = argparse.ArgumentParser(description="Mockup method")
-
     parse.add_argument('dataset', type=str, help="Source dataset to download")
 
     return parse.parse_args()
@@ -65,53 +64,55 @@ def get_return_type(dataset):
 
 
 def main():
-    main_start_time = time.time()
-    args = get_args()
-    exec_log = json_builder.get_exec_log()
+    json_log = LogMng()
+    try:
+        args = get_args()
 
-    # ------------ parameter declaration ------------ #
-    # direct declaration of parameters, you should able to extract these information from input_parameters
-    dataset = args.dataset
-    fields = get_fields(dataset)
-    var_to_plot = get_var_to_plot(dataset)
-    daccess_working_domain = get_daccess_working_domain(dataset)
-    time_freq = get_time_frequency(dataset)
-    return_type = get_return_type(dataset)
+        # ------------ parameter declaration ------------ #
+        # direct declaration of parameters, you should be able to extract this information from input_parameters
+        dataset = args.dataset
+        fields = get_fields(dataset)
+        var_to_plot = get_var_to_plot(dataset)
+        daccess_working_domain = get_daccess_working_domain(dataset)
+        time_freq = get_time_frequency(dataset)
+        return_type = get_return_type(dataset)
 
-    # ------------ file download ------------ #
-    nc_dataset = download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type)
+        # ------------ file download ------------ #
+        nc_dataset = download(daccess_working_domain, dataset, fields, time_freq, return_type, json_log)
 
-    # move download file in root dir and rename in output.nc
-    if return_type == "netCDF4":
-        nc_output = netCDF4.Dataset('output.nc', mode='w')
-        clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
-        nc_output.close()
+        # move download file in root dir and rename in output.nc
+        if return_type == "netCDF4":
+            nc_output = netCDF4.Dataset('output.nc', mode='w')
+            clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
+            nc_output.close()
 
-    # ------------ plot ------------ #
-    if dataset != "C3S_ERA5_MEDSEA_1979_2020_STHUB":    # unable to plot this datasource as is original
-        plot_args = ["output.nc", var_to_plot, '--title=' + ','.join(fields), '--o=output']
-        ncplot.main(plot_args)
+        # ------------ plot ------------ #
+        if dataset != "C3S_ERA5_MEDSEA_1979_2020_STHUB":  # unable to plot this datasource as is original
+            plot_args = ["output.nc", var_to_plot, '--title=' + ','.join(fields), '--o=output']
+            ncplot.main(plot_args)
 
-    # Save info in json file
-    exec_log.add_message("Total time: " + " %s seconds " % (time.time() - main_start_time))
-    err_log = json_builder.LogError(0, "Execution Done")
-    end_time = get_iso_timestamp()
-    json_builder.write_json(error=err_log.__dict__, exec_info=exec_log.__dict__['messages'], end_time=end_time)
+        # Save info in json file
+        json_log.set_done()
+    except Exception as e:  # create mock output file and finalize json log file
+        error_code = 1
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
 
 
-def download(daccess_working_domain, dataset, exec_log, fields, time_freq, return_type):
+def download(daccess_working_domain, dataset, fields, time_freq, return_type, json_log: LogMng):
     print("START MakeInDir")
-    exec_log.add_message("Start Download files")
+    json_log.phase_start("download")  # will create an item download_start in exec section of json file
     nc_dataset = None
-    start_dl_time = time.time()
     try:
         dcs = daccess.Daccess(dataset, fields, time_freq=time_freq)
         nc_dataset = dcs.download(daccess_working_domain, return_type=return_type, rm_file=False)
     except Exception as e:
-        print(e, file=sys.stderr)
-        err_log = json_builder.LogError(-1, str(e))
-        error_exit(err_log, exec_log)
-    exec_log.add_message("Complete Download files", time.time() - start_dl_time)
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+
+    # string here must be equals to phase start
+    json_log.phase_done("download")  # it will create an item download_end in exec section reporting running time
     if nc_dataset is None:
         raise Exception("An error occurs while downloading file")
     return nc_dataset
@@ -152,20 +153,6 @@ def get_time_wd(dataset):
         time_wd = ['1979-01-01T00:00:00', '2021-01-31T00:00:00']
 
     return time_wd
-
-
-def error_exit(err_log, exec_log):
-    """
-    This function is called if there's an error occurs, it writes in log_err the code error with
-    a relative message, then copy some mock files in order to avoid bluecloud to terminate with error
-    """
-    # shutil.copy("./mock/output.nc", "output.nc")
-    # shutil.copy("./mock/output.png", "output.png")
-    end_time = get_iso_timestamp()
-    json_builder.write_json(error=err_log.__dict__,
-                            exec_info=exec_log.__dict__['messages'],
-                            end_time=end_time)
-    exit(0)
 
 
 def get_iso_timestamp():
