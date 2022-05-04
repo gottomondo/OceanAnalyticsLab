@@ -11,7 +11,7 @@ classname_keylog_dict = {
 }
 
 classname_msg_dict = {
-    "Main": "Ocean Climate",
+    "Main": "Method",
     "Plot": "Plot phase",
     "MasterExecution": "Parallel phase",
     "Prod": "Map reduce",
