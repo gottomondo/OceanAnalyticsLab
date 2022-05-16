@@ -177,22 +177,21 @@ class InputParameters:
 
         """
         if not isinstance(self._id_field, str):
-            raise_type_exception("_id_field", "str")
+            self._raise_type_exception("_id_field", "str")
         if self._year is not None and not isinstance(self._year, str):
-            raise_type_exception("_year", "str")
+            self._raise_type_exception("_year", "str")
         if self._start_time is not None and not isinstance(self._start_time, str):
-            raise_type_exception("_start_time", "str")
+            self._raise_type_exception("_start_time", "str")
         if self._end_time is not None and not isinstance(self._end_time, str):
-            raise_type_exception("_end_time", "str")
+            self._raise_type_exception("_end_time", "str")
 
         if self._month is not None and not isinstance(self._month, int):
-            raise_type_exception("month", "int")
+            self._raise_type_exception("month", "int")
 
         if not isinstance(self._data_source, list):
-            raise_type_exception("data_source", "list")
+            self._raise_type_exception("data_source", "list")
         if not isinstance(self._working_domain, dict):
-            raise_type_exception("working_domain", "dict")
+            self._raise_type_exception("working_domain", "dict")
 
-
-def raise_type_exception(name_var, type_name):
-    raise Exception("ERROR Input object: {} is not {}".format(name_var, type_name))
+    def _raise_type_exception(self, name_var, type_name):
+        raise Exception("ERROR Input object: {} is not {}".format(name_var, type_name))
