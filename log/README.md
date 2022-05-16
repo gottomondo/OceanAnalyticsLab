@@ -5,12 +5,14 @@ to integrate the algorithm with a web interface ant to provide also useful infor
 
 The json is composed by four section and one attribute:
 
-- **input**: 
-- **exec_info**: contains execution running time of each function
-- **other**: contains information related to a specific method
-- **error_log** (Mandatory): contains the exit code and an error message, the value is 0 if the method hs been succeeded 
-- **end_time** (Mandatory):  it indicates the moment in which the method has finished its execution (with a timestmap in ISO format and UTC)
-- **worker_logs**: in case of parallel implementation this section will contain the log the workers submitted 
+- **input**
+- **exec_info**
+- **other**
+- **error_log** (Mandatory)
+- **end_time** (Mandatory)
+
+The last two sections are mandatory because they are accessed by the web app. The error log is used to know the execution status of the method,
+the end time to provide to the user a useful info about the execution.
 
 ## Template
 
@@ -38,24 +40,20 @@ The json is composed by four section and one attribute:
         "code": 0,
         "message": "Execution Done"
     },
-    "end_time": "YYYY-MM-DDThh:mm:ss+00:00",
-    "worker_logs": [
-        "worker_i" : {
-           " ..."
-        }
-    ]
+    "end_time": "YYYY-MM-DDThh:mm:ss+00:00"
 }
 ```
 
 As specified in the previous paragraph, only two elements are mandatory, the other one are optional and
 usually are used to better debug the method in case of execution error.
+Note that the exec_info section is automatically created when the class is instanced reporting the time info about the main function.
 
 
 ### Input
 
 This section contains all the parameter received by the method and its value, it is useful because allow us to see what the
 method received as input parameters and to understand the context of the other sections of the log.
-It is a simple dict composed bu the name of the attribute and its value.
+It is a simple dict composed by the name of the attribute and its value.
 
 ### Exec Info
 This section contains information about which function has been executed and the timestamp of the start and the end of the 
@@ -88,8 +86,11 @@ This is done using some mock (empty) output files.
 In case of success execution. as see in the exec info section, it is present the `set_done` function which will
 create the error_log section containing the code equals to 0 and a default message.
 
-In case of error in the method excution, the logmng class provides a function to handle this situation:
+In case of error in the method execution, the logmng class provides a function to handle this situation:
 
 - `def handle_exc(self, traceback_exc: str, exc_msg: str, err_code: int)`: this function must receive some info regarding the
     execution error and the error code to send to the application. Then this function will create the error_log section in the json
     and will copy also the mock output files from the mock directory in the working dir.
+
+### End time
+It indicates the moment in which the method has finished its execution (with a timestamp in ISO format using UTC Time zone)
