@@ -115,3 +115,5 @@ define the behavior of the wep app, instead a third column will specify the opti
 | year              | yyyy inside the time coverage                                                                                  |                                                                               |
 | numeric_parameter | show the label associated to the parameter<br/> ask the value in according to the type and the range specified | type: <br/>- int<br/>- float<br/>range:<br/>- string with syntax: "[min,max]" |
 | model             | the web app receive from the register a list of model entity from which the user can make a choose             | values: list of model object                                                  |
+| string_parameter  | free user input                                                                                                |                                                                               |
+| generic list      | list of predefined values of a specific type from which the user can choose                                    | type:<br/>- int<br/>- str<br/>- ...                                           |
