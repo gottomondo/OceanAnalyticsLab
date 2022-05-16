@@ -54,6 +54,17 @@ def init_input_parameters(input_arguments):
     return input_parameters_class
 
 
+def mockup_input_read(input_parameters: InputParameters):
+    print("\n\nInput arguments\n")
+    print("Data Source:", input_parameters.get_data_source())
+    print("Id Field:", input_parameters.get_id_field())
+    print("Working Domain:", input_parameters.get_working_domain())
+    print("Output Type:", input_parameters.get_output_type())
+    print("Start Time:", input_parameters.get_start_time())
+    print("End Time:", input_parameters.get_end_time())
+    print("Month (optional):", input_parameters.get_month())
+
+
 def main():
     json_log = LogMng()
 
@@ -66,32 +77,42 @@ def main():
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code)
 
-    dataset = input_parameters.get_data_source()
-    fields = input_parameters.get_id_field()
-    working_domain = input_parameters.get_working_domain()
-    id_field = input_parameters.get_id_field()
+    output_type = input_parameters.get_output_type()
 
     try:
 
-        # ------------ file download ------------ #
-        nc_dataset = download(working_domain, dataset, fields, json_log, input_parameters)
+        if output_type == "mockup_download":
 
-        if dataset != "C3S_ERA5_MEDSEA_1979_2020_STHUB":  # unable to plot this datasource as is original
-            # move download file in root dir and rename in output.nc
-            nc_output = netCDF4.Dataset('output.nc', mode='w')
-            clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
-            nc_output.close()
-            # ------------ plot ------------ #
-            var_to_plot = fields_mng.get_output_var(id_field)
-            plot_args = ["output.nc", var_to_plot, '--title=' + ','.join(fields), '--o=output']
-            ncplot.main(plot_args)
-
-        # Save info in json file
-        json_log.set_done()
+            mockup_download(input_parameters, json_log)
+        elif output_type == "mockup_input_read":
+            mockup_input_read(input_parameters)
+        else:
+            raise Exception("Output type '{}' unknown".format(output_type))
     except Exception as e:  # create mock output file and finalize json log file
         error_code = 2
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code)
+
+
+def mockup_download(input_parameters: InputParameters, json_log: LogMng):
+    # read all necessary info from input_parameters
+    dataset = input_parameters.get_data_source()
+    working_domain = input_parameters.get_working_domain()
+    id_field = input_parameters.get_id_field()
+
+    # ------------ file download ------------ #
+    nc_dataset = download(working_domain, dataset, id_field, json_log, input_parameters)
+    if dataset != "C3S_ERA5_MEDSEA_1979_2020_STHUB":  # unable to plot this data source
+        # move download file in root dir and rename in output.nc
+        nc_output = netCDF4.Dataset('output.nc', mode='w')
+        clone_nc_dataset(nc_source=nc_dataset[0], nc_dest=nc_output)
+        nc_output.close()
+        # ------------ plot ------------ #
+        var_to_plot = fields_mng.get_output_var(id_field)
+        plot_args = ["output.nc", var_to_plot, '--title=' + ','.join(id_field), '--o=output']
+        ncplot.main(plot_args)
+    # Save info in json file
+    json_log.set_done()
 
 
 def download(working_domain, dataset, id_field, json_log: LogMng, input_parameters: InputParameters):
