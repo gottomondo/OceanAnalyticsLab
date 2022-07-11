@@ -106,7 +106,8 @@ class StHub(DownloadStrategy):
                 self.generate_dataset_outfile()
                 dataset_outfile = json.load(open('outFile'))
                 complete_list = check_json.get_id(dataset_outfile)
-            except:
+            except Exception as e:
+                print(e.__str__())
                 attempt += 1
                 print("A network error occurred,"
                       "storage hub information retrieval attempt {}, try again within 60 seconds..."

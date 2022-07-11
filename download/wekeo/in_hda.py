@@ -31,38 +31,21 @@ def binary_search(elements, value, mode: int):
 
 class InHDA(InputStrategy):
     def __init__(self):
-        self.lonLat = None
-        self.depth = None
-        self.time = None
-
+        super().__init__()
         self.dataset = db.Dataset()
 
-    def get_wd(self, workingDomain, dataset):
+    def get_depth(self, working_domain, product_id):
         """
-        @param dataset: source dataset
-        @param workingDomain: dict with spatial/time information:
-                lonLat: list of list, the internal list has the format:  [[minLon , maxLon], [minLat , maxLat]]
-                depth: depth range in string format: [minDepth, maxDepth]
-                time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
-        @return: a new working domain with the format required to download from hda
-        """
-        self.lonLat = self.get_lon_lat(workingDomain, dataset)
-        self.depth = self.get_depth(workingDomain, dataset)
-        self.time = self.get_time(workingDomain)
-        return self.__dict__
-
-    def get_depth(self, workingDomain, dataset):
-        """
-        @param dataset: source dataset
-        @param workingDomain: dict with depth information:
+        @param product_id: source dataset
+        @param working_domain: dict with depth information:
                     depth: depth range in string format: [minDepth, maxDepth]
         @return: depth range in string format: [minDepth, maxDepth]
         """
-        depth_dataset = self.dataset.get_depth(dataset)
+        depth_dataset = self.dataset.get_depth(product_id)
         if depth_dataset is None:
-            print("Dataset: ", dataset, " doesn't have depth attribute")
+            print("Dataset: ", product_id, " doesn't have depth attribute")
             return None
-        depth = copy.deepcopy(workingDomain['depth'])
+        depth = copy.deepcopy(working_domain['depth'])
         depth_dataset.sort()
 
         if depth[0] > min(depth_dataset):
@@ -73,39 +56,51 @@ class InHDA(InputStrategy):
         depth[1] = str(binary_search(depth_dataset, depth[1], 1))
 
         if depth is None:
-            raise Exception("Can't extract vertical domain from wd: " + str(workingDomain))
+            raise Exception("Can't extract vertical domain from wd: " + str(working_domain))
         return depth
 
     # time information from daccess is already correct
-    def get_time(self, workingDomain):
-        if 'time' not in workingDomain:
+    def get_time(self, working_domain):
+        if 'time' not in working_domain:
             raise Exception("Can't read time from workingDomain")
-        return workingDomain['time']
+        return working_domain['time']
 
-    def get_lon_lat(self, workingDomain, dataset):
+    def get_lon_lat(self, working_domain, product_id):
         """
-        @param dataset: source dataset
-        @param workingDomain: dict with lonLat information:
+        @param product_id: source dataset
+        @param working_domain: dict with lonLat information:
                     lonLat: list of list, the internal list has the format:  [[minLon , maxLon], [minLat , maxLat]]
         @return: a lonLat represent as a list of float with the template:
                     [minLon, minLat, maxLon, maxLat]
         """
-        if 'lonLat' not in workingDomain:
+        if 'lonLat' not in working_domain:
             raise Exception("Can't read lonLat from workingDomain")
 
-        lonLat_tmp = workingDomain['lonLat']
+        lonLat_tmp = working_domain['lonLat']
         lonLat = [lonLat_tmp[0], lonLat_tmp[2], lonLat_tmp[1], lonLat_tmp[3]]
 
-        lon_dataset = self.dataset.get_lon(dataset)
+        lon_dataset = self.dataset.get_lon(product_id)
         if lonLat[0] > min(lon_dataset):
             lonLat[0] = binary_search(lon_dataset, lonLat[0], 0)
         lonLat[2] = binary_search(lon_dataset, lonLat[2], 1)
 
-        lat_dataset = self.dataset.get_lat(dataset)
+        lat_dataset = self.dataset.get_lat(product_id)
         if lonLat[1] > min(lon_dataset):
             lonLat[1] = binary_search(lat_dataset, lonLat[1], 0)
         lonLat[3] = binary_search(lat_dataset, lonLat[3], 1)
 
         if lonLat is None:
-            raise Exception("Can't extract horizontal domain from wd: " + str(workingDomain))
+            raise Exception("Can't extract horizontal domain from wd: " + str(working_domain))
         return lonLat
+
+    def get_formatted_date(self, year, month, day, time_freq):
+        if time_freq == "y":
+            date_formatted = "{}".format(year)
+        elif time_freq == "m":
+            date_formatted = "{}-{}".format(year, month)
+        elif time_freq == "d":
+            date_formatted = "{}-{}-{}".format(year, month, day)
+        else:
+            raise Exception("Time resolution {} unknown".format(time_freq))
+
+        return date_formatted

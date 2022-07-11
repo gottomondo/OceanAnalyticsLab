@@ -45,7 +45,7 @@ class Daccess:
             self.download_ctx = DownloadContext(hda.HDA(self.hdaKey, self.outDir))
         elif self._infrastructure == 'STHUB':
             print("Downloading from Storage Hub Facility")
-            self.input_ctx = InputContext(in_sthub.InStHub(time_freq=time_freq))
+            self.input_ctx = InputContext(in_sthub.InStHub())
             self.download_ctx = DownloadContext(sthub.StHub(self.dataset, self.outDir))
         else:
             raise Exception('Infrastructure: ' + self._infrastructure + ' not supported')
@@ -109,3 +109,42 @@ def float_int_check(elements):
             print("ERROR lonLat value must be float or int, please check it: ", elements)
             return False
     return True
+
+
+def get_args():
+    import argparse
+
+    parse = argparse.ArgumentParser(description="Daccess")
+    parse.add_argument('product_id', type=str, help="Product to download")
+    parse.add_argument('--fields', nargs='+', type=str, default=list(),
+                       help="List of fields as cf standard name to download")
+    parse.add_argument('start_time', type=str, help="Start time")
+    parse.add_argument('end_time', type=str, help="End time")
+    parse.add_argument('time_freq', type=str, help="Time frequency")
+    parse.add_argument('lon_lat', type=str, help="Lon - Lat coordinate as [minLon, maxLon, minLat, maxLat]")
+    parse.add_argument('depth', type=str, help="Depth")
+
+    return parse.parse_args()
+
+
+if __name__ == '__main__':
+    import json
+    args = get_args()
+
+    product_id = args.product_id
+    fields = args.fields
+    time_freq = args.time_freq
+
+    lon_lat = json.loads(args.lon_lat)
+    start_time = args.start_time
+    end_time = args.end_time
+    depth = json.loads(args.depth)
+
+    daccess_working_domain = dict()
+    daccess_working_domain['time'] = [start_time, end_time]
+    daccess_working_domain['depth'] = depth
+    daccess_working_domain['lonLat'] = lon_lat
+    daccess_working_domain['time_freq'] = time_freq
+
+    dcs = Daccess(product_id, fields)
+    dcs.download(daccess_working_domain, rm_file=False)
