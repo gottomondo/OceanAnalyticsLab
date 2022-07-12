@@ -22,7 +22,7 @@ def get_infrastructure(dataset):
 
 
 class Daccess:
-    def __init__(self, dataset: str, fields: list, output_dir=None, hda_key="", time_freq="m"):
+    def __init__(self, dataset: str, fields: list, output_dir=None, hda_key=""):
         """
         @param dataset: source dataset
         @param fields: cf standard name used to represent a variable
@@ -50,54 +50,54 @@ class Daccess:
         else:
             raise Exception('Infrastructure: ' + self._infrastructure + ' not supported')
 
-    def download(self, daccess_working_domain: dict, **kwargs):
+    def download(self, working_domain_dict: dict, **kwargs):
         """
-        @param daccess_working_domain: dict with spatial/time information:
+        @param working_domain_dict: dict with spatial/time information:
                 lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
                 depth: depth range in string format: [minDepth, maxDepth]
                 time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
         @return: store netCDF file in download directory
             """
 
-        wd_validation(daccess_working_domain)
-        # fix the working_domain format in according to the selected download strategy
-        working_domain = self.input_ctx.get_wd(daccess_working_domain, self.dataset)
+        wd_validation(working_domain_dict)
+        # creating working_domain class in according to the selected download strategy
+        working_domain = self.input_ctx.get_wd(working_domain_dict, self.dataset)
         return self.download_ctx.download(self.dataset, working_domain, self.fields, **kwargs)
 
 
-def wd_validation(workingDomain):
+def wd_validation(working_domain_dict):
     """
     This function check if workingDomain is valid
-    @param workingDomain: dict with spatial/time information:
+    @param working_domain_dict: dict with spatial/time information:
                 lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
                 depth: depth range in string format: [minDepth, maxDepth]
                 time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
     @return: True if workingDomain is valid
     """
     for wd_attr in workingDomain_attrs:
-        if wd_attr not in workingDomain:
-            raise Exception("Can't find " + wd_attr + ' in workingDomain: ' + str(workingDomain))
+        if wd_attr not in working_domain_dict:
+            raise Exception("Can't find " + wd_attr + ' in workingDomain: ' + str(working_domain_dict))
     for wd_attr_opt in workingDomain_attrs_optional:
-        if wd_attr_opt not in workingDomain:
+        if wd_attr_opt not in working_domain_dict:
             print("WARNING: ", wd_attr_opt, ' not found')
 
     # lonLat check
-    lonLat = workingDomain['lonLat']
+    lonLat = working_domain_dict['lonLat']
     if len(lonLat) != 4:
         raise Exception("Wrong size for lonLat, please check it: " + str(lonLat))
     elif not float_int_check(lonLat):
         raise Exception("Type error in lonLat")
 
     # depth check
-    if 'depth' in workingDomain:
-        depth = workingDomain['depth']
+    if 'depth' in working_domain_dict:
+        depth = working_domain_dict['depth']
         if len(depth) != 2:
             raise Exception("Wrong size for depth, please check it: " + str(depth))
         elif not float_int_check(depth):
             raise Exception("Type error in depth")
 
     # time check
-    time = workingDomain['time']
+    time = working_domain_dict['time']
     if len(time) != 2:
         raise Exception("Wrong size for lonLat, please check it: " + str(time))
 
@@ -127,7 +127,7 @@ def get_args():
     return parse.parse_args()
 
 
-if __name__ == '__main__':
+def main():
     import json
     args = get_args()
 
@@ -148,3 +148,7 @@ if __name__ == '__main__':
 
     dcs = Daccess(product_id, fields)
     dcs.download(daccess_working_domain, rm_file=False)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from download.src.working_domain import WorkingDomain
 
 
 class DownloadStrategy(ABC):
@@ -10,7 +11,7 @@ class DownloadStrategy(ABC):
     """
 
     @abstractmethod
-    def download(self, dataset, working_domain, fields,
+    def download(self, dataset: str, working_domain: WorkingDomain, fields: list,
                  in_memory=False, rm_file=True, max_attempt=5, return_type="netCDF4"):
         """
         @param dataset: source dataset

@@ -1,6 +1,7 @@
+import copy
 from download.interface.iinput import InputStrategy
 from download.wekeo import dataset_access as db
-import copy
+from download.src.wd_hda import WorkingDomainHda
 
 
 def binary_search(elements, value, mode: int):
@@ -60,7 +61,7 @@ class InHDA(InputStrategy):
         return depth
 
     # time information from daccess is already correct
-    def get_time(self, working_domain):
+    def get_time_range(self, working_domain):
         if 'time' not in working_domain:
             raise Exception("Can't read time from workingDomain")
         return working_domain['time']
@@ -93,14 +94,16 @@ class InHDA(InputStrategy):
             raise Exception("Can't extract horizontal domain from wd: " + str(working_domain))
         return lonLat
 
-    def get_formatted_date(self, year, month, day, time_freq):
-        if time_freq == "y":
-            date_formatted = "{}".format(year)
-        elif time_freq == "m":
-            date_formatted = "{}-{}".format(year, month)
-        elif time_freq == "d":
-            date_formatted = "{}-{}-{}".format(year, month, day)
-        else:
-            raise Exception("Time resolution {} unknown".format(time_freq))
-
-        return date_formatted
+    def get_wd(self, working_domain_dict, product_id):
+        """
+                    @param product_id: product to download
+                    @param working_domain_dict: dict with spatial/time information:
+                        lonLat: list of list, the internal list has the format:  [[minLon , maxLon], [minLat , maxLat]]
+                        depth: depth range in string format: [minDepth, maxDepth]
+                        time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
+                        """
+        lon_lat = self.get_lon_lat(working_domain_dict, product_id)
+        depth = self.get_depth(working_domain_dict, product_id)
+        time_range = self.get_time_range(working_domain_dict)
+        time_freq = self._get_time_freq(working_domain_dict)
+        return WorkingDomainHda(lon_lat, depth, time_range, time_freq)

@@ -1,11 +1,12 @@
 import warnings
 import os
+import sys
+import time
+from download.src import utils
+from download.src.wd_hda import WorkingDomainHda
 from download.wekeo import functions as hdaf, dataset_access as db
 from download.interface.idownload import DownloadStrategy
-import time
-from download import utils
-import netCDF4
-import sys
+
 
 warnings.filterwarnings('ignore')
 
@@ -21,15 +22,12 @@ def get_outfile(field, date):
     @param date: the date of output file
     @return: the output filename that depends from variables and date
     """
-    from download import utils
     type_file = utils.get_type_file(field)
     date_pattern = date[0:4] + date[5:7]
     return date_pattern + '_mm-HDA--' + type_file + '-Mfs-MED_re'
 
 
 def get_filename_from_string_template(string_template):
-    from download import utils
-
     ID_PRODUCT, type_file, YYYYMM, depth_tmp, lonLat_tmp = string_template.split('%')
 
     field = utils.get_field(type_file)
@@ -117,7 +115,7 @@ class HDA(DownloadStrategy):
             self.hdaInit['download_dir_path'] = download_dir_path
             self.hda = hdaf.init(dataset_id, self.api_key, download_dir_path)
 
-    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True, max_attempt=5,
+    def download(self, dataset, working_domain: WorkingDomainHda, fields, in_memory=False, rm_file=True, max_attempt=5,
                  return_type="netCDF4"):
         """
         @param in_memory: if True the function return a netCDF4.Dataset in memory.
@@ -131,7 +129,7 @@ class HDA(DownloadStrategy):
         @param fields: cf standard name used to represent a variable
         @return: download in outdir the correct netCDF file/s or return a netCDF4 in memory
         """
-        time = working_domain['time']
+        time = working_domain.get_time()
         # pair list: first element is the dataset type, second element is the variable to download from dataset
 
         map_dataset_with_variables_and_outfile = self.extract_map_dataset_with_var_and_outfile(dataset, fields, time)
@@ -166,10 +164,10 @@ class HDA(DownloadStrategy):
         return map_dataset_with_variables_and_outfile
 
     def get_file_from_hda(self, dataset, dataset_field, variables_outfile, in_memory, rm_file, max_attempt,
-                          working_domain, return_type):
-        lonLat = working_domain['lonLat']
-        depth = working_domain['depth']
-        time = working_domain['time']
+                          working_domain: WorkingDomainHda, return_type):
+        lon_lat = working_domain.get_lon_lat()
+        depth = working_domain.get_depth()
+        time = working_domain.get_time()
         outfile = variables_outfile['outfile'][0]
 
         output_file = self.outdir + '/' + outfile + '.nc'
@@ -178,7 +176,7 @@ class HDA(DownloadStrategy):
         else:
             variables_to_download = variables_outfile['variables']
             dataset_id = self.dataset.get_dataset_id(dataset, dataset_field)
-            data_json_request = self.dataset.get_data(dataset, dataset_field, variables_to_download, lonLat, depth,
+            data_json_request = self.dataset.get_data(dataset, dataset_field, variables_to_download, lon_lat, depth,
                                                       time)
             nc_file = self.download_from_hda(dataset_id, data_json_request, output_file, in_memory, max_attempt,
                                              return_type)

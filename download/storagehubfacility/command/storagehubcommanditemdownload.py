@@ -7,7 +7,7 @@
 # 
 import requests
 from .storagehubcommand import StorageHubCommand
-from download import utils
+from download.src import utils
 
 
 class StorageHubCommandItemDownload(StorageHubCommand):

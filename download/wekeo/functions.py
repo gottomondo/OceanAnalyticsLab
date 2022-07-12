@@ -5,7 +5,7 @@ import json
 import re
 import requests
 
-from download import utils
+from download.src import utils
 
 
 def generate_api_key(username, password):
@@ -105,7 +105,7 @@ def get_token_from_wekeo(hda_dict):
 
 
 def get_token_from_bluecloud_proxy():
-    from download import utils
+    from download.src import utils
 
     globalVariablesFile = os.path.dirname(__file__).split('download')[0] + '/globalvariables.csv'
     gcubeToken = utils.get_gcube_token(globalVariablesFile)

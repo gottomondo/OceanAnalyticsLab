@@ -1,4 +1,5 @@
 import time
+import os
 
 
 def get_field(type_file):
@@ -6,10 +7,9 @@ def get_field(type_file):
     @param type_file: String that represent the file type
     @return: return the field associated to the input_file as cf standard name
     """
-    import os
     import json
-    actual_dir = os.path.dirname(__file__)
-    with open(actual_dir + '/config/filename.json') as json_file:
+    root_dir = get_root_dir()
+    with open(root_dir + '/config/filename.json') as json_file:
         filename = json.load(json_file)
     field = None
     for type_file_tmp, fields_tmp in filename.items():
@@ -26,10 +26,9 @@ def get_type_file(field):
     @param field: cf standard name used to represent a variable
     @return: return the type file associated to field indicated
     """
-    import os
     import json
-    actual_dir = os.path.dirname(__file__)
-    with open(actual_dir + '/config/filename.json') as json_file:
+    root_dir = get_root_dir()
+    with open(root_dir + '/config/filename.json') as json_file:
         filename = json.load(json_file)
 
     type_file = None
@@ -47,10 +46,10 @@ def init_dl_dir(outdir=None):
     If not exists, create the download dir
     @return: the path of default download directory
     """
-    import os
 
     if outdir is None:
-        outdir = os.path.dirname(__file__).split('download')[0] + '/indir'
+        root_dir = get_root_dir()
+        outdir = root_dir + '/indir'
     # create new dir called 'indir' in the parent directory of daccess module
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -58,8 +57,6 @@ def init_dl_dir(outdir=None):
 
 
 def get_gcube_token(globalVariablesFile):
-    import os
-
     gcubeToken = None
     envs = os.environ
     if 'GCUBE_TOKEN' in envs:  # when a method is executed in the dataminer
@@ -94,3 +91,14 @@ def show_dl_percentage(dl, start, total_length):
                       % (dl / (1024 * 1024), (dl / (time.process_time() - start)) / 1024))
             except:
                 pass
+
+
+def get_root_dir(base_dir=None) -> str:
+    """
+    @return: absolute path of root dir where there's seastat.py script
+    """
+    if base_dir is not None:
+        root_dir = base_dir
+    else:
+        root_dir = os.path.dirname(__file__).split('download')[0] + '/download'
+    return root_dir

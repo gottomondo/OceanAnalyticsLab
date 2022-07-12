@@ -41,7 +41,7 @@ class StorageHubFacility:
         return self.executeOperation(in_memory, dl_status)
 
     def retrieveToken(self):
-        from download import utils
+        from download.src import utils
         # print("Retrieve gcubeToken")
         if not os.path.isfile(self.globalVariablesFile):
             print("File does not exist: " + self.globalVariablesFile)
