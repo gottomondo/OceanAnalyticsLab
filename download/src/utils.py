@@ -49,7 +49,7 @@ def init_dl_dir(outdir=None):
 
     if outdir is None:
         root_dir = get_root_dir()
-        outdir = root_dir + '/indir'
+        outdir = root_dir + '../indir'
     # create new dir called 'indir' in the parent directory of daccess module
     if not os.path.exists(outdir):
         os.makedirs(outdir)
