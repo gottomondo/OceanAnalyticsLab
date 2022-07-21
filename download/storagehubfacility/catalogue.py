@@ -2,7 +2,7 @@ import json
 import os
 
 
-class Dataset:
+class Catalogue:
     def __init__(self):
         actual_dir = os.path.dirname(__file__)
         with open(actual_dir + '/../config/sthub_dataset.json') as json_file:

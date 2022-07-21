@@ -5,7 +5,7 @@ import os
 
 from download.storagehubfacility import storagehubfacility as sthubf, check_json
 from download.interface.idownload import DownloadStrategy
-from download.storagehubfacility import dataset_access as db
+from download.storagehubfacility import catalogue
 from download.src import utils
 from download.src.working_domain import WorkingDomain
 
@@ -22,27 +22,6 @@ def handle_network_error(output_file, attempt, max_attempt):
         raise ConnectionError("ERROR An error occurs while download input file")
     else:
         wait_to_restart_connection(attempt, output_file)
-
-
-def get_outfile(field, date):
-    """
-    @param field: cf standard name used to represent a variable
-    @param date: the date of output file
-    @return: the output filename that depends on variables and date
-    """
-    type_file = utils.get_type_file(field)
-    date_pattern = date[0:4] + date[5:7]
-    return date_pattern + '_mm-INGV--' + type_file + '-MFSs4b3-MED-fv04.00'
-
-
-def get_filename_from_string_template(string_template):
-
-    ID_PRODUCT, type_file, YYYYMM, depth_tmp, lonLat_tmp = string_template.split('%')
-
-    field = utils.get_field(type_file)
-    time = YYYYMM[0:4] + '-' + YYYYMM[4:6]
-
-    return get_outfile(field[0], time)
 
 
 def rm(filename):
@@ -95,7 +74,7 @@ class StHub(DownloadStrategy):
         """
         self.outdir = utils.init_dl_dir(outdir)
         self.dataset_id = dataset_id
-        self.dataset = db.Dataset()
+        self.dataset = catalogue.Catalogue()
         self.dataset_files = self.retrieve_file_available_on_workspace()  # list of (id, name_file) pairs
 
     def retrieve_file_available_on_workspace(self, attempt=0, max_attempt=5):
@@ -188,18 +167,18 @@ def filter_dataset(file_list, working_domain: WorkingDomain, file_types):
     This function filters the input list and return a new list with the file with
     the type of files desired
     @param file_types: pattern that identifies the type of files
-    @param working_domain: dict with time information:
-            time: date in string format: [YYYYMM]
+    @param working_domain: dict with time_list information:
+            time_list: date in string format: [YYYYMM]
     @param file_list: list containing (id, file_name) pairs to be filtered
     @return: list that contains only files of desired type
     """
 
-    time = working_domain.get_time()
+    time_list = working_domain.get_time()
     filtered_list = list()
     for file in file_list:
         for file_type in file_types:
             if file_type in file[1]:
-                for t in time:
+                for t in time_list:
                     if t + '01_m' in file[1]:  # med pattern: YYYYMM01_m*
                         if file not in filtered_list:
                             filtered_list.append(file)
