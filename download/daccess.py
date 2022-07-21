@@ -139,6 +139,7 @@ def main():
     start_time = args.start_time
     end_time = args.end_time
     depth = json.loads(args.depth)
+    outdir = args.outdir
 
     daccess_working_domain = dict()
     daccess_working_domain['time'] = [start_time, end_time]
@@ -146,7 +147,7 @@ def main():
     daccess_working_domain['lonLat'] = lon_lat
     daccess_working_domain['time_freq'] = time_freq
 
-    dcs = Daccess(product_id, fields)
+    dcs = Daccess(product_id, fields, output_dir=outdir)
     dcs.download(daccess_working_domain, rm_file=False)
 
 
