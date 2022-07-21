@@ -123,6 +123,7 @@ def get_args():
     parse.add_argument('time_freq', type=str, help="Time frequency")
     parse.add_argument('lon_lat', type=str, help="Lon - Lat coordinate as [minLon, maxLon, minLat, maxLat]")
     parse.add_argument('depth', type=str, help="Depth")
+    parse.add_argument('-o', '--outdir', dest="outdir", type=str, default=None, help="Path of output directory")
 
     return parse.parse_args()
 
