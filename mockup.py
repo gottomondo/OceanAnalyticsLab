@@ -17,7 +17,7 @@ wdir = "./indir"
 def get_args():
     import argparse
 
-    parse = argparse.ArgumentParser(description="Mockup method")
+    parse = argparse.ArgumentParser(description="SSI method")
     parse.add_argument('input_parameters', type=str, help="JSON-like string (use ' instead of \")")
 
     return parse.parse_args()
@@ -48,42 +48,137 @@ def get_return_type(dataset):
     return return_type
 
 
-def init_input_parameters(input_arguments):
+def init_input_parametersSSI(input_arguments):
     input_parameters_json_like = input_arguments.input_parameters
     input_parameters_class = InputParameters(input_parameters_json_like)
     return input_parameters_class
 
 
-def mockup_input_read(input_parameters: InputParameters):
+def prepare_input_parametersSSI(input_arguments):
+    #Data Source
+    try:
+        if input_parameters.get_data_source() != "C3S_ERA5_MEDSEA_1979_2020_STHUB":
+            raise Exception("Only data source C3S_ERA5_MEDSEA_1979_2020_STHUB is currently available")
+    except Exception as e: 
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+    
+    #Output type
+    try:
+        if input_parameters.get_output_type() is None:
+            input_parameters.update_output_type('ssi_percentile_min') #default (NOW MANDATORY!!!)
+        elif input_parameters.get_output_type not in {'ssi_percentile', 'ssi_percentile_min', 'ssi_fixed'}::
+            raise Exception("Output type '{}' unknown".format(input_parameters.get_output_type()))
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)    
+        
+
+    #Title
+    try:
+        if input_parameters.get_title() is None:
+            input_parameters.update_get_title('SSI_output') #default
+        title = input_parameters.get_title()
+        forbidden_chars = ' "*\\/\'|?:<>'
+        for x in title:
+            if x in forbidden_chars:
+                raise Exception("Title can not contain %s" % (forbidden_chars)")
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)          
+                                
+                                
+    #Start time & End time (MANDATORY)
+    starttime = date.fromisoformat(input_parameters.get_start_time())
+    endtime = date.fromisoformat(input_parameters.get_end_time())                             
+    try:
+        if enddate < startdate:
+            raise Exception("Illegal End time: End time must be after Start time")
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)    
+
+    #Stepsize Time                            
+                                
+                                if args.time_stepsize > 0 and args.time_stepsize < 11:
+        stepsize = args.time_stepsize
+    else:
+        raise Exception('Íllegal stepsize')
+
+    allowed_stepunits = {'None':1, 'Days':2, 'Months':3, 'Years':4}
+    if args.time_stepunit in allowed_stepunits:
+        stepunit=allowed_stepunits[args.time_stepunit]
+    else:
+        raise Exception('Íllegal stepunit')
+
+    valid_workdomain = daccess_working_domain['lonLat']   
+    args.workdomain = eval(args.workdomain)
+    if len(args.workdomain)==4 :
+        workdomain= args.workdomain
+        if args.workdomain[0] < valid_workdomain[0] or args.workdomain[1] > valid_workdomain[1] or args.workdomain[2] < valid_workdomain[2] or args.workdomain[3] > valid_workdomain[3] :
+            raise Exception('Íllegal workdomain')
+
+    if args.threshold_perc in {'P90', 'P95', 'P98', 'P99'} :
+        windspeed_threshold_percentile= args.threshold_perc
+    else:
+        raise Exception('Illegal percentile')
+
+    if args.threshold_value > 0:
+        windspeed_threshold_value = args.threshold_value
+ 
+
+
+
+
+
+def summarize_input_parametersSSI(input_parameters: InputParametersSSI):
     print("\n\nInput arguments\n")
     print("Data Source:", input_parameters.get_data_source())
-    print("Id Field:", input_parameters.get_id_field())
-    print("Working Domain:", input_parameters.get_working_domain())
+    #print("Id Field:", input_parameters.get_id_field())
     print("Output Type:", input_parameters.get_output_type())
+    print("Title:", input_parameters.get_title())   
     print("Start Time:", input_parameters.get_start_time())
     print("End Time:", input_parameters.get_end_time())
-    print("Month (optional):", input_parameters.get_month())
-
+    print("Working Domain:", input_parameters.get_working_domain()) 
+    print("Stepsize Time:", input_parameters.get_time_stepsize())
+    print("Stepunit Time:", input_parameters.get_time_stepunit())
+    print("Windspeed threshold percentile:", input_parameters.get_threshold_perc())
+    print("Windspeed threshold value (m/s):", input_parameters.get_threshold_value())
+    
 
 def main():
     json_log = LogMng()
 
     try:
         args = get_args()
-        input_parameters: InputParameters = init_input_parameters(input_arguments=args)
-        json_log.set_input_parameters(input_parameters.get_input_parameters())  # save input args info in json log
-    except Exception as e:  # create mock output file and finalize json log file
+        input_parametersSSI: InputParametersSSI = init_input_parametersSSI(input_arguments=args)
+        json_log.set_input_parameters(input_parametersSSI.get_input_parameters())  # save input args info in json log
+    except Exception as e:  # create SSI output file and finalize json log file
         error_code = 1
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code)
 
-    output_type = input_parameters.get_output_type()
+    #Validate and prepare SSI calculation input
+    
+    #Summarize SSI calculation input
+    
+    #Download dataset
+    
+    #Start calculation
+    
+    
+    
+    output_type = input_parametersSSI.get_output_type()
 
     try:
 
         if output_type == "mockup_download":
 
-            mockup_download(input_parameters, json_log)
+            mockup_download(input_parametersSSI, json_log)
         elif output_type == "mockup_input_read":
             mockup_input_read(input_parameters)
         else:
