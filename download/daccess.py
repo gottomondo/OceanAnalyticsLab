@@ -4,14 +4,16 @@ from download.contexts.input_ctx import InputContext
 from download.contexts.download_ctx import DownloadContext
 from download.wekeo import in_hda, hda
 from download.storagehubfacility import in_sthub, sthub
+from download.src import utils
 
 workingDomain_attrs = ['lonLat', 'time']
 workingDomain_attrs_optional = ['depth']
 
 
 def get_infrastructure(dataset):
-    actual_dir = os.path.dirname(__file__)
-    with open(actual_dir + '/config/dataset_infrastructures.json') as json_file:
+    root_dir = utils.get_root_dir()
+    json_inf_file = root_dir + '/config/dataset_infrastructures.json'
+    with open(json_inf_file) as json_file:
         dataset_infrastructures = json.load(json_file)
     if dataset in dataset_infrastructures:
         infrastructure = dataset_infrastructures[dataset]['infrastructure']
