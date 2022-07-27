@@ -1,4 +1,4 @@
-# Mockup method
+# Mockup SSI method (README update in progress)
 
 This is a simple tools to deploy a working method on D4Science.
 In this method the first  prototype version of *daccess* module is released.
