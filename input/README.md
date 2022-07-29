@@ -43,8 +43,8 @@ Actually, the input module supports the following types:
 
 The class iparameter.py should be seen as a super class which contains a set of parameters that can be common between all methods: 
 
-- **data_source**
-- **id_output_type**
+- **data_source** (mandatory)
+- **id_output_type** (mandatory)
 - **id_field**
 - **working_domain**
 - **start_time**
