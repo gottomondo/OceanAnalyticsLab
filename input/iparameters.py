@@ -68,14 +68,20 @@ def dict_to_json_like_str(json_str: str):
 class InputParameters:
     def __init__(self, input_parameters_string: str):
         self._input_parameters_dict: dict = get_json_input_parameters(input_parameters_string)
-        self._id_output_type: str = self._extract_mandatory_attribute('id_output_type')
-        self._id_field: str = self._extract_mandatory_attribute('id_field')
+        
+        #self._id_output_type: str = self._extract_mandatory_attribute('id_output_type')
+        #self._id_field: str = self._extract_mandatory_attribute('id_field')
+        
         self._data_source: list = self._extract_mandatory_attribute('data_source')
         self._working_domain: dict = self._extract_mandatory_attribute('working_domain')
         self._validate_wd()
+       
+        #The following parameters that have default values available
+        self._id_output_type: str = self._extract_optional_attribute('id_output_type')
+        self._id_field: str = self._extract_optional_attribute('id_field')
+            
 
         self._year: str = self._extract_optional_attribute('year')
-
         self._month: int = self._extract_optional_attribute('month')
         self._start_time: str = self._extract_start_time_from_input_parameters()
         self._end_time: str = self._extract_end_time_from_input_parameters()
@@ -176,7 +182,8 @@ class InputParameters:
         Returns: raise an exception if there is an input parameter with a wrong type
 
         """
-        if not isinstance(self._id_field, str):
+        #if not isinstance(self._id_field, str):  
+        if self._id_field is not None and not isinstance(self._id_field, str):    
             self._raise_type_exception("_id_field", "str")
         if self._year is not None and not isinstance(self._year, str):
             self._raise_type_exception("_year", "str")
