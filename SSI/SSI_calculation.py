@@ -100,7 +100,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     print("===SSI METHOD STARTED===\n")
     
     #inputfile = 'indir/C3S_ERA5_Medsea_1979_2020_allmonths_alldays.nc'
-    inputfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", ".nc")
+    inputfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_WIND.nc")
     
     try:
         dsInput = Dataset(inputfile)
@@ -115,7 +115,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
   
 
     #pvaluesfile = 'indir/C3S_ERA5_Medsea_1979_2020_windspeed_P90959899.nc'
-    pvaluesfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_P90959899.nc")
+    pvaluesfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_WIND_P90959899.nc")
     
     try:
         dsPVals = Dataset(pvaluesfile)
@@ -173,7 +173,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
     #Get the specified title to create the outputfile and remove blanks
     #outputfile= clean_filename(outputfile)
-    outputfile= "outdir/"+ input_parameters.get_title() + "_out.nc"
+    outputfile= input_parameters.get_title() + "_output.nc"
 
     #Validate and process StartDate and EndDate
     startdate = date.fromisoformat(input_parameters.get_start_time())
@@ -602,7 +602,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
         nc.SSIAreanrdays.plot(ax=axes[2], color="red", marker="o")
         nc.SSIArearate.plot(ax=axes[3], color="red", marker="o")
         plt.tight_layout()
-        timeseriesplot = outputfile.replace("_out.nc", "") + "_area_timeseries.png"
+        timeseriesplot = outputfile.replace("_output.nc", "") + "_area_timeseries.png"
         plt.savefig(timeseriesplot, format='png')
         plt.show()
         plt.close()

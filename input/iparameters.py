@@ -122,6 +122,9 @@ class InputParameters:
     def get_output_type(self):
         return self._id_output_type
 
+    def update_output_type(self, new_output_type):
+        self._id_output_type=new_output_type
+
     def get_id_field(self):
         return self._id_field
 

@@ -21,18 +21,33 @@ class InputParametersSSI(InputParameters):
     def get_title(self):
         return self._title
 
+    def update_title(self, new_title):
+        self._title = new_title
+    
     def get_time_stepsize(self):
         return self._time_stepsize
 
+    def update_time_stepsize(self, new_time_stepsize):
+        self._time_stepsize = new_time_stepsize
+    
     def get_time_stepunit(self):
         return self._time_stepunit
 
+    def update_time_stepunit(self, new_time_stepunit):
+        self._time_stepunit = new_time_stepunit
+    
     def get_threshold_perc(self):
         return self._threshold_perc
 
+    def update_threshold_perc(self, new_threshold_perc):
+        self._threshold_perc = new_threshold_perc
+    
     def get_threshold_value(self):
         return self._threshold_value
 
+    def update_threshold_value(self, new_threshold_value):
+        self._threshold_value = new_threshold_value
+    
     def _validate_input_SSIparameters(self):
         """
         Validate the typeof each parameter
@@ -61,7 +76,15 @@ def init_input_parametersSSI(input_arguments):
 
 def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
-    #Data Source
+    #Data Source (MANDATORY)
+    try:
+        if input_parameters.get_data_source() is None:
+            raise Exception("No data source specified (mandatory input)")
+    except Exception as e: 
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+    
     try:
         if input_parameters.get_data_source() != "C3S_ERA5_MEDSEA_1979_2020_STHUB":
             raise Exception("Only data source C3S_ERA5_MEDSEA_1979_2020_STHUB is currently available")
@@ -84,7 +107,7 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
     #Title
     try:
         if input_parameters.get_title() is None:
-            input_parameters.update_get_title('SSI_calculation') #default
+            input_parameters.update_title('SSI') #default
         title = input_parameters.get_title()
         forbidden_chars = ' "*\\/\'|?:<>'
         for x in title:
@@ -96,17 +119,41 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         exit(error_code)          
                                                                
     #Start time & End time (MANDATORY)
+    try:
+        if input_parameters.get_start_time() is None:
+            raise Exception("No start time specified (mandatory input)")
+    except Exception as e: 
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+    
+    try:
+        if input_parameters.get_end_time() is None:
+            raise Exception("No end time specified (mandatory input)")
+    except Exception as e: 
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+    
     starttime = date.fromisoformat(input_parameters.get_start_time())
     endtime = date.fromisoformat(input_parameters.get_end_time())                             
     try:
         if endtime < starttime:
-            raise Exception("Illegal End time: End time must be after Start time")
+            raise Exception("Illegal end time: End time must be after start time")
     except Exception as e:
         error_code = 2
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code)    
         
-    #Workdomain = boundingbox
+    #Workdomain = boundingbox (MANDATORY)
+    try:
+        if input_parameters.get_working_domain() is None:
+            raise Exception("No working domain specified (mandatory input)")
+    except Exception as e: 
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)
+    
     workdomain= wd.get_horizontal_domain(input_parameters.get_working_domain())[0]
     try:
         if workdomain[0] > workdomain[1] or workdomain[2] > workdomain[3] :
@@ -117,6 +164,8 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         exit(error_code)    
         
     #Stepsize Time
+    if input_parameters.get_time_stepsize() is None:
+        input_parameters.update_time_stepsize(1) #default
     stepsize=input_parameters.get_time_stepsize()
     try:
         if stepsize < 1 and stepsize >10:
@@ -127,6 +176,8 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         exit(error_code)    
 
     #Stepsize Unit 
+    if input_parameters.get_time_stepunit() is None:
+        input_parameters.update_time_stepunit('Years') #default
     allowed_stepunits = {'None':1, 'Days':2, 'Months':3, 'Years':4}
     stepunitstr=input_parameters.get_time_stepunit()
     try:
@@ -139,7 +190,9 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code) 
 
-    #Windspeed threshold percentile    
+    #Windspeed threshold percentile
+    if input_parameters.get_threshold_perc() is None:
+        input_parameters.update_threshold_perc('P98') #default    
     windspeed_threshold_percentile= input_parameters.get_threshold_perc()
     try:
         if windspeed_threshold_percentile not in {'P90', 'P95', 'P98', 'P99'} :
@@ -150,6 +203,8 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         exit(error_code) 
 
     #Windspeed threshold value    
+    if input_parameters.get_threshold_value() is None:
+        input_parameters.update_threshold_value(15.0) #default    
     windspeed_threshold_value = input_parameters.get_threshold_value()
     try:
         if windspeed_threshold_value <= 0:
@@ -167,8 +222,8 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
     
 def summarize_input_parametersSSI(input_parameters: InputParametersSSI):
     print("\n\nInput arguments SSI method\n")
-    inputfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", ".nc")
-    pvaluesfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_P90959899.nc")
+    inputfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_WIND.nc")
+    pvaluesfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_WIND_P90959899.nc")
     print("Data Source (inputfile)\t\t:", inputfile)
     print("Data Source (pvaluesfile)\t:", pvaluesfile)
     print("Output Type\t\t\t:", input_parameters.get_output_type())
@@ -181,3 +236,5 @@ def summarize_input_parametersSSI(input_parameters: InputParametersSSI):
     print("Windspeed threshold percentile\t:", input_parameters.get_threshold_perc())
     print("Windspeed threshold value (m/s)\t:", input_parameters.get_threshold_value())
     print("\n\n")
+
+    

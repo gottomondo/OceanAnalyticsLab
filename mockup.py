@@ -43,9 +43,9 @@ def main():
 
     try:
         #output_type = input_parametersSSI.get_output_type()                        
-                           
+                    
         #Download data source into running environment (if needed) - currently files in sthub. 
-        #data_download(input_parametersSSI, json_log)
+        data_download(input_parametersSSI, json_log)
         
         #Prepare SSI calculation input
         validate_input_parametersSSI(input_parametersSSI, json_log)
