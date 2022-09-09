@@ -55,7 +55,7 @@ def download_from_sthub(file_to_download, output_file, in_memory, max_attempt, d
     item_id = file_to_download[0]
     item_size = file_to_download[2]
     myshfo = sthubf.StorageHubFacility(operation="Download", ItemId=item_id, localFile=output_file, itemSize=item_size)
-
+    
     attempt = 0
     file_is_downloaded = False
     while attempt < max_attempt and not file_is_downloaded:
@@ -125,7 +125,9 @@ class StHub(DownloadStrategy):
 
     def find_files_to_download(self, dataset, fields, working_domain):
         file_types = self.find_file_types_associated_to_dataset(dataset, fields)
-        files_to_download = filter_dataset(self.dataset_files, working_domain, file_types)
+        
+        #JWN: files_to_download = filter_dataset(self.dataset_files, working_domain, file_types)
+        files_to_download = self.dataset_files
         if len(files_to_download) == 0:
             raise Exception("No file available to download in the selected domain")
         else:
@@ -193,7 +195,6 @@ def filter_dataset(file_list, working_domain, file_types):
     @param file_list: list containing (id, file_name) pairs to be filtered
     @return: list that contains only files of desired type
     """
-
     time = working_domain['time']
     filtered_list = list()
     for file in file_list:

@@ -160,6 +160,10 @@ class InputParameters:
 
     def update_end_time(self, new_end_time):
         self._end_time = new_end_time
+        
+    def update_id_field(self, new_id_field):
+        #JWN addition
+        self._id_field = new_id_field
 
     def to_json_str(self):
         dict_to_convert_full = self.__dict__
@@ -185,7 +189,7 @@ class InputParameters:
         Returns: raise an exception if there is an input parameter with a wrong type
 
         """
-        #if not isinstance(self._id_field, str):  
+        #if not isinstance(self._id_field, str):
         if self._id_field is not None and not isinstance(self._id_field, str):    
             self._raise_type_exception("_id_field", "str")
         if self._year is not None and not isinstance(self._year, str):

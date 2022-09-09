@@ -12,9 +12,10 @@ def get_depth(workingDomain):
         return None
 
     depth = workingDomain['depth']
-
+    #JWN: no exception if depth is None
     if depth is None:
-        raise Exception("Can't extract vertical domain from wd: " + str(workingDomain))
+        return None
+        #raise Exception("Can't extract vertical domain from wd: " + str(workingDomain))
     return depth
 
 

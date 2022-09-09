@@ -76,6 +76,7 @@ def init_input_parametersSSI(input_arguments):
 
 def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
+    
     #Data Source (MANDATORY)
     try:
         if input_parameters.get_data_source() is None:

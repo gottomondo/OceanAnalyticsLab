@@ -89,12 +89,14 @@ def wd_validation(workingDomain):
         raise Exception("Type error in lonLat")
 
     # depth check
+    # JWN ignore depth is None
     if 'depth' in workingDomain:
         depth = workingDomain['depth']
-        if len(depth) != 2:
-            raise Exception("Wrong size for depth, please check it: " + str(depth))
-        elif not float_int_check(depth):
-            raise Exception("Type error in depth")
+        if depth is not None:
+            if len(depth) != 2:
+                raise Exception("Wrong size for depth, please check it: " + str(depth))
+            elif not float_int_check(depth):
+                raise Exception("Type error in depth")
 
     # time check
     time = workingDomain['time']

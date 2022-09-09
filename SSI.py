@@ -41,8 +41,7 @@ def main():
         exit(error_code)
                                                   
 
-    try:
-        #output_type = input_parametersSSI.get_output_type()                        
+    try:                     
                     
         #Download data source into running environment (if needed) - currently files in sthub. 
         data_download(input_parametersSSI, json_log)
@@ -63,6 +62,7 @@ def data_download(input_parameters: InputParameters, json_log: LogMng):
     # read all necessary info from input_parameters
     dataset = input_parameters.get_data_source()
     working_domain = input_parameters.get_working_domain()
+    input_parameters.update_id_field('wind_speed')
     id_field = input_parameters.get_id_field()
 
     # ------------ file download ------------ #
@@ -83,11 +83,11 @@ def download(working_domain, dataset, id_field, json_log: LogMng, input_paramete
 
         # convert parameters in daccess format
         daccess_working_domain = wd.init_daccess_working_domain(working_domain)  # convert format of working domain
-        #fields = fields_mng.get_cf_standard_name(id_field)
+        fields = fields_mng.get_cf_standard_name(id_field)
         times = time_utils.get_time_range_wd(start_time, end_time, month)
         if dataset == "C3S_ERA5_MEDSEA_1979_2020_STHUB":    # download the timerange file
             times = [times[0]]  # it's sufficient to match with one of the timerange dates in the file to download
-        dcs = daccess.Daccess(dataset, fields=None, time_freq="y")
+        dcs = daccess.Daccess(dataset, fields, time_freq="y")
         for time in times:
             daccess_working_domain['time'] = time
             nc_dataset = dcs.download(daccess_working_domain, return_type="str", rm_file=False)
