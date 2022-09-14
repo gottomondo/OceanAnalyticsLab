@@ -88,7 +88,8 @@ class LogMng:
 
         # wps method will always look for the output files, also if execution has failed
         # provide mock output files allow us to be able to return a correct log file
-        shutil.copy("./mock/output.nc", "output.nc")
-        shutil.copy("./mock/output.png", "output.png")
+        shutil.copy("./mock/SSIoutput.nc", "SSIoutput.nc")
+        shutil.copy("./mock/SSImaps.png", "SSImaps.png")
+        shutil.copy("./mock/SSItimeseries.png", "SSItimeseries.png")
 
         self.write_json()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import traceback
-from datetime import date
+from datetime import date, datetime
 from input.iparameters import InputParameters
 from input import working_domain as wd
 from log.logmng import LogMng
@@ -136,8 +136,11 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
         json_log.handle_exc(traceback.format_exc(), str(e), error_code)
         exit(error_code)
     
-    starttime = date.fromisoformat(input_parameters.get_start_time())
-    endtime = date.fromisoformat(input_parameters.get_end_time())                             
+    #starttime = date.fromisoformat(input_parameters.get_start_time())
+    starttime = datetime.strptime(input_parameters.get_start_time(), "%Y-%m-%d")
+    #endtime = date.fromisoformat(input_parameters.get_end_time())
+    endtime = datetime.strptime(input_parameters.get_end_time(), "%Y-%m-%d")
+                              
     try:
         if endtime < starttime:
             raise Exception("Illegal end time: End time must be after start time")

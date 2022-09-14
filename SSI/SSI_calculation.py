@@ -26,7 +26,7 @@ import cartopy.crs as ccrs
 from calendar import monthrange
 from os.path import  isfile 
 from netCDF4 import Dataset, num2date
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 # functions
@@ -149,7 +149,8 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     #determine time extent
     # timeVariable.units contains "hours since yyyy-mm-dd hh:MM:ss"
     mindate_tmp = re.split(" ", timeVariable.units )
-    mindate = date.fromisoformat(mindate_tmp[2])
+    #mindate = date.fromisoformat(mindate_tmp[2])
+    mindate = datetime.strptime(mindate_tmp[2], "%Y-%m-%d")
     maxdate=mindate + timedelta(days=nrdays)
 
     #determine latitude extent
@@ -173,12 +174,16 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
     #Get the specified title to create the outputfile and remove blanks
     #outputfile= clean_filename(outputfile)
-    outputfile= input_parameters.get_title() + "_output.nc"
+    #outputfile= input_parameters.get_title() + "_output.nc"
+    outputfile= "SSIoutput.nc"
+    
 
     #Validate and process StartDate and EndDate
-    startdate = date.fromisoformat(input_parameters.get_start_time())
-    enddate = date.fromisoformat(input_parameters.get_end_time())
-
+    #startdate = date.fromisoformat(input_parameters.get_start_time())
+    startdate = datetime.strptime(input_parameters.get_start_time(), "%Y-%m-%d")
+    #enddate = date.fromisoformat(input_parameters.get_end_time())
+    enddate = datetime.strptime(input_parameters.get_end_time(), "%Y-%m-%d")
+    
     if startdate < mindate:
         startdate = mindate
     if enddate > maxdate:
@@ -482,14 +487,19 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
     nc = xr.open_dataset(outputfile)
 
-    SSItotalselected = SSImaxselected = SSInrdaysselected =  SSIrateselected = 0
+    #SSItotalselected = 0
+    SSItotalselected = 1
+    SSImaxselected = SSInrdaysselected =  SSIrateselected = 0
     
     #SSItotalselected = SSItotalselection.value
     #SSImaxselected = SSImaxselection.value
     #SSInrdaysselected = SSInrdaysselection.value
     #SSIrateselected = SSIrateselection.value
     
-    plotlimit = plotmaps = 0
+    #plotlimit = plotmaps = 0
+    plotlimit = 50
+    plotmaps = 1
+    
     plotseries = 1
     
     #plotlimit = Plotlimitation.value - 1
@@ -498,17 +508,26 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
 
     nrmaps = SSItotalselected + SSImaxselected + SSInrdaysselected + SSIrateselected
 
-    if nrmaps == 1:
-        plt.rcParams['figure.figsize'] = 15, 8.
-    elif nrmaps == 2:
-        plt.rcParams['figure.figsize'] = 15, 12.
-    elif nrmaps == 3:
-        plt.rcParams['figure.figsize'] = 15, 16.
-    else:
-        plt.rcParams['figure.figsize'] = 15, 20.
-
+    #if nrmaps == 1:
+    #    plt.rcParams['figure.figsize'] = 15, 8.
+    #elif nrmaps == 2:
+    #    plt.rcParams['figure.figsize'] = 15, 12.
+    #elif nrmaps == 3:
+    #    plt.rcParams['figure.figsize'] = 15, 16.
+    #else:
+    #    plt.rcParams['figure.figsize'] = 15, 20.
+    
+    xx=15
+    nrmaps=nrsteps+1
+    if nrmaps > plotlimit:
+        nrmaps=plotlimit+1
+    xx= 15
+    yy= 4*nrmaps
+    plt.rcParams['figure.figsize'] = xx, yy
     plt.rcParams['axes.facecolor']='white'
     plt.rcParams['savefig.facecolor']='white'
+    plt.rcParams['figure.subplot.hspace'] = 0.5
+    mapindex=0
 
 
     if plotmaps:
@@ -546,7 +565,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
             else:
                 titlename = titlename + " (threshold fixed %3.1f m/s)" % (windspeed_threshold_value)
 
-            mapindex=0
+            #mapindex=0
 
             if SSItotalselected:
                 mapindex += 1
@@ -584,30 +603,42 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
                 ax.coastlines()
                 ax.gridlines(draw_labels=True)
 
-            plt.tight_layout()
+            #plt.tight_layout()
             filetitlename = filetitlename.replace(' ', '_')
-            plt.savefig("%s_map_%s.png" % (outputfile, filetitlename), format='png')
-            plt.show()
-            plt.close()
+            #plt.savefig("%s_map_%s.png" % (outputfile, filetitlename), format='png')
+            #plt.show()
+            #plt.close()
 
+            
             if ii == plotlimit :
                 ii=nrsteps
                 break
-
+        
+        plt.tight_layout()
+        plt.savefig("SSImaps.png", format='png')
+        #plt.show()
+        plt.close()
+        print("SSI map plots created: SSImaps.png")
+        
 
     if plotseries and nrsteps > 1 :
+        plt.rcParams['figure.figsize'] = 15, 20.
         fig, axes = plt.subplots(nrows=4)
         nc.SSIAreatotal.plot(ax=axes[0], color="red", marker="o")
         nc.SSIAreamax.plot(ax=axes[1], color="red", marker="o")
         nc.SSIAreanrdays.plot(ax=axes[2], color="red", marker="o")
         nc.SSIArearate.plot(ax=axes[3], color="red", marker="o")
+        
         plt.tight_layout()
         timeseriesplot = outputfile.replace("_output.nc", "") + "_area_timeseries.png"
-        plt.savefig(timeseriesplot, format='png')
+        #plt.savefig(timeseriesplot, format='png')
+        plt.savefig("SSItimeseries.png", format='png')
         plt.show()
         plt.close()
 
-    print("SSI area time series plot created: %s" % timeseriesplot)
-    print("\n\n===SSI METHOB COMPLETED===")
+        #print("SSI area time series plot created: %s" % timeseriesplot)
+        print("SSI area time series plots created: SSItimeseries.png")
+    
+    print("\n\n===SSI METHOD COMPLETED===")
 
 
