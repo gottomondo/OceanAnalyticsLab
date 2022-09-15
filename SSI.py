@@ -50,7 +50,10 @@ def main():
         validate_input_parametersSSI(input_parametersSSI, json_log)
                                 
         #Calculation and store output results
-        calculateSSI(input_parametersSSI, json_log)                        
+        calculateSSI(input_parametersSSI, json_log)  
+        
+        # Save info in json file
+        json_log.set_done()
                                 
     except Exception as e:  # create SSI output file and finalize json log file
         error_code = 2
@@ -67,8 +70,7 @@ def data_download(input_parameters: InputParameters, json_log: LogMng):
 
     # ------------ file download ------------ #
     nc_dataset = download(working_domain, dataset, id_field, json_log, input_parameters)
-    # Save info in json file
-    json_log.set_done()
+
                                
 
 

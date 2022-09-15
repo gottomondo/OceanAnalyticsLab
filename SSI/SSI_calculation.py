@@ -98,7 +98,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     
     # source  data (ERA5 hourly wind speeds and wind percentiles
     print("===SSI METHOD STARTED===\n")
-    
+    json_log.phase_start("Calculate SSI")
     #inputfile = 'indir/C3S_ERA5_Medsea_1979_2020_allmonths_alldays.nc'
     inputfile = "indir/" + (input_parameters.get_data_source()).replace("_STHUB", "_WIND.nc")
     
@@ -181,14 +181,25 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     #Validate and process StartDate and EndDate
     #startdate = date.fromisoformat(input_parameters.get_start_time())
     startdate = datetime.strptime(input_parameters.get_start_time(), "%Y-%m-%d")
+   
     #enddate = date.fromisoformat(input_parameters.get_end_time())
     enddate = datetime.strptime(input_parameters.get_end_time(), "%Y-%m-%d")
     
-    if startdate < mindate:
-        startdate = mindate
-    if enddate > maxdate:
-        enddate = maxdate
-
+    #if startdate < mindate:
+    #    startdate = mindate
+    #if enddate > maxdate:
+    #    enddate = maxdate
+    
+    try:
+        if startdate < mindate:
+            raise Exception("Start date %s outside input TIME RANGE: %s till %s" % (startdate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))
+        if enddate > maxdate:
+            raise Exception("End date %s outside input TIME RANGE: %s till %s" % (enddate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))                
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)    
+        
     #determine time interval
     deltastart = startdate-mindate
     deltastartday=deltastart.days
@@ -255,9 +266,24 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     startlatdeg= wd.get_horizontal_domain(input_parameters.get_working_domain())[0][2]
     endlatdeg = wd.get_horizontal_domain(input_parameters.get_working_domain())[0][3]
 
+    try:
+        if startlongdeg < minlongdeg:
+            raise Exception("Start longitude %3.1f outside input long. RANGE: %3.1f till %3.1f" % (startlongdeg, minlongdeg, maxlongdeg))
+        if endlongdeg > maxlongdeg:
+            raise Exception("End longitude %s outside input long. RANGE: %3.1f till %3.1f" % (endlongdeg, minlongdeg, maxlongdeg))                
+        if startlatdeg < minlatdeg:
+            raise Exception("Start latitude %s outside input lat. RANGE: %3.1f till %3.1f" % (startlatdeg, minlatdeg, maxlatdeg))                
+        if endlatdeg > maxlatdeg:
+            raise Exception("End latitude %s outside input lat. RANGE: %3.1f till %3.1f" % (endlatdeg, minlatdeg, maxlatdeg))                
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)    
+                             
     print("\tLatitude range:" ,startlatdeg, endlatdeg)
     print("\tLongitude range:", startlongdeg, endlongdeg)
-
+    #print("Source data AREA BBOX; latitude %3.1f till %3.1f and longitude %3.1f till %3.1f" % (minlatdeg, maxlatdeg, minlongdeg, maxlongdeg))
+    
     #Latitude range
     #startlat = int((startlatdeg - minlatdeg)/stepdeg)
     startlat = int((maxlatdeg - endlatdeg)/stepdeg)
@@ -395,10 +421,10 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
         timestepsize[step] = timestepsize[step-1] + stepsizedays
 
     print("\nCALCULATION finished\n")
+    json_log.phase_done("Calculate SSI")
 
-
+    json_log.phase_start("Save SSI output data")
     # ### Save calculated SSI grid data and timeseries in output file
-
     #
     #create outputfile
     #
@@ -499,7 +525,6 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     #plotlimit = plotmaps = 0
     plotlimit = 50
     plotmaps = 1
-    
     plotseries = 1
     
     #plotlimit = Plotlimitation.value - 1
@@ -558,9 +583,9 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
                 titlename = "Period %s - %s" % (titlestartdate, titleenddate)
 
             filetitlename = titlename
-            if windthreshold_perc =='Percentile':
+            if windthreshold_perc =='ssi_percentile':
                 titlename = titlename + "(threshold %s percentile)" % (windspeed_threshold_percentile)
-            elif windthreshold_perc =='Percentile with min.':
+            elif windthreshold_perc =='ssi_percentile_min':
                 titlename = titlename + " (threshold %s percentile with min. %3.1f m/s )" % (windspeed_threshold_percentile, windspeed_threshold_value)
             else:
                 titlename = titlename + " (threshold fixed %3.1f m/s)" % (windspeed_threshold_value)
@@ -604,7 +629,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
                 ax.gridlines(draw_labels=True)
 
             #plt.tight_layout()
-            filetitlename = filetitlename.replace(' ', '_')
+            #filetitlename = filetitlename.replace(' ', '_')
             #plt.savefig("%s_map_%s.png" % (outputfile, filetitlename), format='png')
             #plt.show()
             #plt.close()
@@ -630,14 +655,16 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
         nc.SSIArearate.plot(ax=axes[3], color="red", marker="o")
         
         plt.tight_layout()
-        timeseriesplot = outputfile.replace("_output.nc", "") + "_area_timeseries.png"
+        #timeseriesplot = outputfile.replace("_output.nc", "") + "_area_timeseries.png"
         #plt.savefig(timeseriesplot, format='png')
         plt.savefig("SSItimeseries.png", format='png')
-        plt.show()
+        #plt.show()
         plt.close()
 
         #print("SSI area time series plot created: %s" % timeseriesplot)
         print("SSI area time series plots created: SSItimeseries.png")
+    
+    json_log.phase_done("Save SSI output data")
     
     print("\n\n===SSI METHOD COMPLETED===")
 
