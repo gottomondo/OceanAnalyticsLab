@@ -262,8 +262,8 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     
     #Validate and process Latitude and Longitude ranges
     startlongdeg = wd.get_horizontal_domain(input_parameters.get_working_domain())[0][0]
-    endlongdeg = wd.get_horizontal_domain(input_parameters.get_working_domain())[0][1]
-    startlatdeg= wd.get_horizontal_domain(input_parameters.get_working_domain())[0][2]
+    endlongdeg = wd.get_horizontal_domain(input_parameters.get_working_domain())[0][2]
+    startlatdeg= wd.get_horizontal_domain(input_parameters.get_working_domain())[0][1]
     endlatdeg = wd.get_horizontal_domain(input_parameters.get_working_domain())[0][3]
 
     try:

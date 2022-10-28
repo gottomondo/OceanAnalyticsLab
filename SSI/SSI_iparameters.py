@@ -160,7 +160,7 @@ def validate_input_parametersSSI(input_parameters: InputParametersSSI, json_log:
     
     workdomain= wd.get_horizontal_domain(input_parameters.get_working_domain())[0]
     try:
-        if workdomain[0] > workdomain[1] or workdomain[2] > workdomain[3] :
+        if workdomain[0] > workdomain[2] or workdomain[1] > workdomain[3] :
             raise Exception('Íllegal workdomain (lat/long coordinates horizontal box)')
     except Exception as e:
         error_code = 2
