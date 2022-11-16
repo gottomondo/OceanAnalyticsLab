@@ -327,10 +327,10 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     SSIAreandays=np.zeros((nrsteps), dtype=np.int32)
     SSIArearate=np.zeros((nrsteps), dtype=np.float32)
 
-    timeperiod=np.zeros(nrsteps)
+    timeperiod=np.zeros(nrsteps, dtype=np.int32)
     timestepsize=np.zeros(nrsteps+1)
-    latitude_range=np.zeros(deltaperiodlat)
-    longitude_range=np.zeros(deltaperiodlong)
+    latitude_range=np.zeros(deltaperiodlat, dtype=np.float32)
+    longitude_range=np.zeros(deltaperiodlong, dtype=np.float32)
 
     #Initialize
     timeperiod[0]=timeVariable[deltastartday*24]
@@ -360,6 +360,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     startidx=deltastartday
     endidx=deltastartday
     step=0
+    deltadays=0
     currentstartdate = startdate
     currentenddate = startdate
 
@@ -386,6 +387,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
             currentdelta = currentenddate - currentstartdate
             stepsizedays = currentdelta.days
             endidx += stepsizedays
+            
         elif stepunit == 4: #years
             startidx = endidx
             currentstartdate = currentenddate
@@ -397,12 +399,14 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
         if endidx > deltaendday:
             endidx = deltaendday
 
+        
         timeperiod[step]=timeVariable[startidx*24]
 
         for dayidx in range(startidx, endidx):   
             startHourIndex = (dayidx * 24)
             endHourIndex = startHourIndex+24
-            newdayidx = step*(endidx - startidx) + (dayidx - startidx)
+            # newdayidx = step*(endidx - startidx) + (dayidx - startidx)
+            newdayidx = deltadays + (dayidx - startidx)
 
             # Load the data from the NetCDF variable for this specific day (24 hours)
             windspeedPerDay = windspeedVariable[startHourIndex:endHourIndex][:][:]
@@ -410,15 +414,18 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
             # Calculate day and add to timestep
             calcSSIDayStep(SSIdaily, SSIoutput, SSImax, SSIrate, SSIndays, windspeedPerDay, windthreshold_perc, SSIwindspeed_perc, windspeed_threshold_value, startlat, startlong, newdayidx, step, deltaperiodlat ,deltaperiodlong)
 
+        
         #Calculate area totals of a timestep
         calcSSIAreaStep(SSIAreaoutput, SSIAreamax, SSIArearate, SSIAreandays,SSIoutput, SSImax, SSIrate, SSIndays, step, deltaperiodlat ,deltaperiodlong)
 
         #Next step
         print('.', end='', flush=True)
+        deltadays += (endidx - startidx)
         step += 1
         timestepsize[step] = timestepsize[step-1] + stepsizedays
 
     print("\nCALCULATION finished\n")
+    
     json_log.phase_done("Calculate SSI")
 
     json_log.phase_start("Save SSI output data")
