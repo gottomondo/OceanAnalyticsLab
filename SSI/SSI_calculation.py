@@ -31,7 +31,7 @@ from datetime import date, timedelta, datetime
 
 # functions
 def diff_month(d1, d2):
-    return (d1.year - d2.year) * 12 + d1.month - d2.month +1
+    return (d1.year - d2.year) * 12 + d1.month - d2.month + 1
 
 def clean_filename(name):
         forbidden_chars = ' "*\\/\'|?:<>'
@@ -185,30 +185,7 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
     #enddate = date.fromisoformat(input_parameters.get_end_time())
     enddate = datetime.strptime(input_parameters.get_end_time(), "%Y-%m-%d")
     
-    #if startdate < mindate:
-    #    startdate = mindate
-    #if enddate > maxdate:
-    #    enddate = maxdate
-    
-    try:
-        if startdate < mindate:
-            raise Exception("Start date %s outside input TIME RANGE: %s till %s" % (startdate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))
-        if enddate > maxdate:
-            raise Exception("End date %s outside input TIME RANGE: %s till %s" % (enddate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))                
-    except Exception as e:
-        error_code = 2
-        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
-        exit(error_code)    
-        
-    #determine time interval
-    deltastart = startdate-mindate
-    deltastartday=deltastart.days
-    deltaperiod = enddate-startdate
-    #include enddate +1
-    #deltaperiodday=deltaperiod.days + 1
-    deltaperiodday=deltaperiod.days
-    deltaendday=deltastartday+deltaperiodday
-    
+
     print("SUMMARY OF SSI CALCULATION PARAMETERS (INPUT):" )
 
     #Validate and process StepUnit and StepSize
@@ -231,6 +208,27 @@ def calculateSSI(input_parameters: InputParametersSSI, json_log: LogMng):
         print ("\tStart:", startdate)
         print ("\tEnd(including):", enddate)
 
+    try:
+        if startdate < mindate:
+            raise Exception("Start date %s outside input TIME RANGE: %s till %s" % (startdate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))
+        if enddate > maxdate:
+            raise Exception("End date %s outside input TIME RANGE: %s till %s" % (enddate.strftime("%Y-%m-%d"), mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d")))                
+    except Exception as e:
+        error_code = 2
+        json_log.handle_exc(traceback.format_exc(), str(e), error_code)
+        exit(error_code)    
+        
+        
+    #determine time interval
+    deltastart = startdate-mindate
+    deltastartday=deltastart.days
+    deltaperiod = enddate-startdate
+    #include enddate +1
+    #deltaperiodday=deltaperiod.days + 1
+    deltaperiodday=deltaperiod.days
+    deltaendday=deltastartday+deltaperiodday
+        
+    
     if stepunit==1:
         stepsize=1
     if stepunit >1:
