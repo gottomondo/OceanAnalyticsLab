@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from download.src import working_domain
+from download.src.working_domain import WorkingDomain
 
 
 class InputStrategy(ABC):
@@ -11,7 +11,7 @@ class InputStrategy(ABC):
     """
 
     @abstractmethod
-    def get_wd(self, working_domain_dict, product_id):
+    def get_wd(self, working_domain_dict, product_id) -> WorkingDomain:
         pass
 
     @abstractmethod

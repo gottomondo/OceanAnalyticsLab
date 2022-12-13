@@ -1,5 +1,7 @@
-import os
+#!/usr/bin/env python
+
 import json
+
 from download.contexts.input_ctx import InputContext
 from download.contexts.download_ctx import DownloadContext
 from download.wekeo import in_hda, hda
@@ -27,10 +29,9 @@ class Daccess:
     def __init__(self, dataset: str, fields: list, output_dir=None, hda_key=""):
         """
         @param dataset: source dataset
-        @param fields: cf standard name used to represent a variable
+        @param fields: fields to download as cf standard name (used to represent a variable)
         @param output_dir: output directory
-        @param hda_key: key to access to hda service, leave "" if you want to use bluecloud proxy
-        @param return_type: if netCDF4 return a netCDF4.Dataset, if str return the output filename
+        @param hda_key: key to access to hda service, leave "" if you want to use D4Science proxy
         """
         self.fields = fields
         self.outDir = output_dir
@@ -42,7 +43,7 @@ class Daccess:
 
         # select the right input/download interface
         if self._infrastructure == 'WEKEO':
-            print("Downloading from MEDSEA_MULTIYEAR_PHY_006_004")
+            print("Downloading from WEkEO")
             self.input_ctx = InputContext(in_hda.InHDA())
             self.download_ctx = DownloadContext(hda.HDA(self.hdaKey, self.outDir))
         elif self._infrastructure == 'STHUB':
@@ -55,9 +56,15 @@ class Daccess:
     def download(self, working_domain_dict: dict, **kwargs):
         """
         @param working_domain_dict: dict with spatial/time information:
-                lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
-                depth: depth range in string format: [minDepth, maxDepth]
-                time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
+                    lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
+                    depth: depth range in string format: [minDepth, maxDepth]
+                    time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
+        As kwargs:
+        @param in_memory: if True, try to download the file directly in memory -> it's not fully supported
+        @param rm_file: if True, remove file from disk after load it in memory
+        @param max_attempt: maximum number of download attempt in case of errors
+        @param return_type: if netCDF4 return a netCDF4.Dataset, if str return the output filename
+                                if is str, please disable rm_file and in_memory
         @return: store netCDF file in download directory
             """
 
@@ -96,6 +103,7 @@ def wd_validation(working_domain_dict):
         if len(depth) != 2:
             raise Exception("Wrong size for depth, please check it: " + str(depth))
         elif not float_int_check(depth):
+            print("ERROR lonLat value must be float or int, please check it: ", depth)
             raise Exception("Type error in depth")
 
     # time check
@@ -108,7 +116,6 @@ def float_int_check(elements):
     for x in elements:
         if not isinstance(x, float) and not isinstance(x, int):
             print("ERROR found no float or int type: ", x)
-            print("ERROR lonLat value must be float or int, please check it: ", elements)
             return False
     return True
 
