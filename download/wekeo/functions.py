@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 import time
 import json
 import re
@@ -186,6 +187,12 @@ def acceptTandC(hda_dict):
     return hda_dict
 
 
+def print_response_error(response: requests.Response):
+    print(f"Status code: {response.status_code}", file=sys.stderr)
+    print(f"Reason: {response.reason}", file=sys.stderr)
+    print(f"Error details: {response.text}", file=sys.stderr)
+
+
 def get_job_id(hda_dict, data):
     """ 
     Assigns a job id for the data request.
@@ -206,6 +213,7 @@ def get_job_id(hda_dict, data):
         job_id = json.loads(response.text)['jobId']
         print("Query successfully submitted. Job ID is " + job_id)
     else:
+        print_response_error(response)
         job_id = ""
         print("Error: Unexpected response {}".format(response))
 
