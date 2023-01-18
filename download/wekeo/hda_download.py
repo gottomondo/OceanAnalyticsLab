@@ -3,8 +3,8 @@ import os
 import sys
 import time
 from download.src import utils
-from download.src.wd_hda import WorkingDomainHda
-from download.wekeo import functions as hdaf, dataset_access as db
+from download.wekeo.hda_wd import WorkingDomainHda
+from download.wekeo import functions as hdaf, hda_catalogue as db
 from download.interface.idownload import DownloadStrategy
 
 

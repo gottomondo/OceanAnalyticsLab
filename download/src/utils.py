@@ -108,3 +108,53 @@ def get_root_dir(base_dir=None) -> str:
     else:
         root_dir = os.path.dirname(__file__).split('download')[0] + '/download'
     return root_dir
+
+
+workingDomain_attrs = ['lonLat', 'time']
+workingDomain_attrs_optional = ['depth']
+
+
+def wd_dict_validation(working_domain_dict):
+    """
+    This function check if workingDomain is valid
+    @param working_domain_dict: dict with spatial/time information:
+                lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
+                depth: depth range in string format: [minDepth, maxDepth]
+                time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
+    @return: True if workingDomain is valid
+    """
+    for wd_attr in workingDomain_attrs:
+        if wd_attr not in working_domain_dict:
+            raise Exception("Can't find " + wd_attr + ' in workingDomain: ' + str(working_domain_dict))
+    for wd_attr_opt in workingDomain_attrs_optional:
+        if wd_attr_opt not in working_domain_dict:
+            print("WARNING: ", wd_attr_opt, ' not found')
+
+    # lonLat check
+    lonLat = working_domain_dict['lonLat']
+    if len(lonLat) != 4:
+        raise Exception("Wrong size for lonLat, please check it: " + str(lonLat))
+    elif not float_int_check(lonLat):
+        raise Exception("Type error in lonLat")
+
+    # depth check
+    if 'depth' in working_domain_dict:
+        depth = working_domain_dict['depth']
+        if len(depth) != 2:
+            raise Exception("Wrong size for depth, please check it: " + str(depth))
+        elif not float_int_check(depth):
+            print("ERROR lonLat value must be float or int, please check it: ", depth)
+            raise Exception("Type error in depth")
+
+    # time check
+    time = working_domain_dict['time']
+    if len(time) != 2:
+        raise Exception("Wrong size for lonLat, please check it: " + str(time))
+
+
+def float_int_check(elements):
+    for x in elements:
+        if not isinstance(x, float) and not isinstance(x, int):
+            print("ERROR found no float or int type: ", x)
+            return False
+    return True

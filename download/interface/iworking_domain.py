@@ -18,9 +18,6 @@ class WorkingDomain(ABC):
     def get_depth(self):
         return self._depth
 
-    def get_time_range(self):
-        return self.get_time_range()
-
     def get_time_freq(self):
         return self._time_freq
 

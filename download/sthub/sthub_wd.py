@@ -1,4 +1,4 @@
-from download.src.working_domain import WorkingDomain
+from download.interface.iworking_domain import WorkingDomain
 from download.src import time_utils
 
 

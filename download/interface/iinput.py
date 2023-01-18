@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from download.src.working_domain import WorkingDomain
+from download.interface.iworking_domain import WorkingDomain
 
 
 class InputStrategy(ABC):

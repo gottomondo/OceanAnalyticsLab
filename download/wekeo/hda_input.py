@@ -1,7 +1,7 @@
 import copy
 from download.interface.iinput import InputStrategy
-from download.wekeo import dataset_access as db
-from download.src.wd_hda import WorkingDomainHda
+from download.wekeo import hda_catalogue as db
+from download.wekeo.hda_wd import WorkingDomainHda
 
 
 def binary_search(elements, value, mode: int):

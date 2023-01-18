@@ -1,4 +1,4 @@
-from download.src.working_domain import WorkingDomain
+from download.interface.iworking_domain import WorkingDomain
 from download.src import time_utils
 
 
@@ -45,6 +45,7 @@ class WorkingDomainHda(WorkingDomain):
         return [time_list[0], time_list[-1]]
 
     def get_formatted_date(self, year, month, day, time_freq):
+        """Return the date in the format request by HDA API"""
         date_formatted = "{}-{}-{}".format(year, month, day)
 
         return date_formatted

@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
 import json
+import os
+import sys
+
+from download.src.utils import wd_dict_validation
+
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from download.contexts.input_ctx import InputContext
 from download.contexts.download_ctx import DownloadContext
-from download.wekeo import in_hda, hda
-from download.storagehubfacility import in_sthub, sthub
+from download.wekeo import hda_input, hda_download
+from download.sthub import sthub_input, sthub_download
 from download.src import utils
-
-workingDomain_attrs = ['lonLat', 'time']
-workingDomain_attrs_optional = ['depth']
 
 
 def get_infrastructure(dataset):
@@ -44,12 +49,12 @@ class Daccess:
         # select the right input/download interface
         if self._infrastructure == 'WEKEO':
             print("Downloading from WEkEO")
-            self.input_ctx = InputContext(in_hda.InHDA())
-            self.download_ctx = DownloadContext(hda.HDA(self.hdaKey, self.outDir))
+            self.input_ctx = InputContext(hda_input.InHDA())
+            self.download_ctx = DownloadContext(hda_download.HDA(self.hdaKey, self.outDir))
         elif self._infrastructure == 'STHUB':
             print("Downloading from Storage Hub Facility")
-            self.input_ctx = InputContext(in_sthub.InStHub())
-            self.download_ctx = DownloadContext(sthub.StHub(self.dataset, self.outDir))
+            self.input_ctx = InputContext(sthub_input.InStHub())
+            self.download_ctx = DownloadContext(sthub_download.StHub(self.dataset, self.outDir))
         else:
             raise Exception('Infrastructure: ' + self._infrastructure + ' not supported')
 
@@ -68,56 +73,10 @@ class Daccess:
         @return: store netCDF file in download directory
             """
 
-        wd_validation(working_domain_dict)
+        wd_dict_validation(working_domain_dict)
         # creating working_domain class in according to the selected download strategy
         working_domain = self.input_ctx.get_wd(working_domain_dict, self.dataset)
         return self.download_ctx.download(self.dataset, working_domain, self.fields, **kwargs)
-
-
-def wd_validation(working_domain_dict):
-    """
-    This function check if workingDomain is valid
-    @param working_domain_dict: dict with spatial/time information:
-                lonLat: list of list, the internal list has the format:  [minLon , maxLon, minLat , maxLat]
-                depth: depth range in string format: [minDepth, maxDepth]
-                time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
-    @return: True if workingDomain is valid
-    """
-    for wd_attr in workingDomain_attrs:
-        if wd_attr not in working_domain_dict:
-            raise Exception("Can't find " + wd_attr + ' in workingDomain: ' + str(working_domain_dict))
-    for wd_attr_opt in workingDomain_attrs_optional:
-        if wd_attr_opt not in working_domain_dict:
-            print("WARNING: ", wd_attr_opt, ' not found')
-
-    # lonLat check
-    lonLat = working_domain_dict['lonLat']
-    if len(lonLat) != 4:
-        raise Exception("Wrong size for lonLat, please check it: " + str(lonLat))
-    elif not float_int_check(lonLat):
-        raise Exception("Type error in lonLat")
-
-    # depth check
-    if 'depth' in working_domain_dict:
-        depth = working_domain_dict['depth']
-        if len(depth) != 2:
-            raise Exception("Wrong size for depth, please check it: " + str(depth))
-        elif not float_int_check(depth):
-            print("ERROR lonLat value must be float or int, please check it: ", depth)
-            raise Exception("Type error in depth")
-
-    # time check
-    time = working_domain_dict['time']
-    if len(time) != 2:
-        raise Exception("Wrong size for lonLat, please check it: " + str(time))
-
-
-def float_int_check(elements):
-    for x in elements:
-        if not isinstance(x, float) and not isinstance(x, int):
-            print("ERROR found no float or int type: ", x)
-            return False
-    return True
 
 
 def get_args():

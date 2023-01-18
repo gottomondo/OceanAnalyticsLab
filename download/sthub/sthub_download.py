@@ -3,11 +3,11 @@ import time
 import json
 import os
 
-from download.storagehubfacility import storagehubfacility as sthubf, check_json
+from download.sthub import sthub_facility as sthubf, check_json
 from download.interface.idownload import DownloadStrategy
-from download.storagehubfacility import catalogue
+from download.sthub import sthub_catalogue
 from download.src import utils
-from download.src.working_domain import WorkingDomain
+from download.interface.iworking_domain import WorkingDomain
 
 
 def wait_to_restart_connection(attempt, output_file):
@@ -74,7 +74,7 @@ class StHub(DownloadStrategy):
         """
         self.outdir = utils.init_dl_dir(outdir)
         self.dataset_id = dataset_id
-        self.dataset = catalogue.Catalogue()
+        self.dataset = sthub_catalogue.Catalogue()
         self.dataset_files = self.retrieve_file_available_on_workspace()  # list of (id, name_file) pairs
 
     def retrieve_file_available_on_workspace(self, attempt=0, max_attempt=5):

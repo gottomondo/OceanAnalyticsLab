@@ -7,6 +7,7 @@ def generate_time_list(start_time, end_time, time_freq):
 
     start_year = int(start_time[0:4])
     end_year = int(end_time[0:4])
+    # default value to handle all supported frequencies
     start_month = 1
     end_month = 12
     start_day = 1
@@ -40,7 +41,10 @@ def generate_time_list(start_time, end_time, time_freq):
 
 def extract_month(input_date):
     if isinstance(input_date, str):
-        month = int(input_date[5:7])
+        if len(input_date) == 6 or len(input_date) == 7:     # case date format is YYYYMM or YYYY-MM
+            month = int(input_date[-2:])
+        else:
+            raise Exception(f"ERROR Can't extract month from date: {input_date}")
     else:
         raise Exception("Can't extract month from data type: {}", type(input_date))
 
