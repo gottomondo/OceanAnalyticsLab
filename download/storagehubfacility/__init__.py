@@ -1,2 +1,0 @@
-from . import storagehubfacility
-StorageHubFacility= storagehubfacility.StorageHubFacility

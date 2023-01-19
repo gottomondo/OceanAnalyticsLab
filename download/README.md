@@ -2,12 +2,12 @@
 ## General multi-platform download API
 
 Daccess is python module that allow the download from 
-different data sources using always the same interface.
-It creates a layer between your method and the infrastructure 
+different infrastructures using always the same interface.
+It creates a layer between our method and the infrastructure 
 where the files are stored in order to make transparent the download
 of data.
 
-Now it supports the download from two different infrastructures:
+Currently it supports the download from two different infrastructures:
 
 1. StorageHub Facility (d4science service,  https://dev.d4science.org/)
 2. Harmonised Data Access (HDA, https://www.wekeo.eu/docs/harmonised-data-access-api)
@@ -20,16 +20,15 @@ Now it supports the download from two different infrastructures:
 
 When download data, it's important to specify the desired working 
 domain, in order to download only the necessary data.
-In addition, some service like HDA supports also the 
+Some service like HDA supports the 
 sub-setting of the domain, it means that the download file will
 contain only the region indicated in the working domain.
 
 Each infustrucure require a different format for the working domain.
 The formatting of the working domain in accordance with the 
-specifications of the specific infrastructure 
-will be performed automatically.
+specifications of the specific infrastructure will be performed automatically.
 
-To optimize the conversion process, daccess defines its own specification for the working domain.
+To optimize the conversion process, daccess defines its own specification for the working domain to receive as input from the user:
 
 ```json
 {
@@ -82,9 +81,8 @@ Then it is possible to download the data simply passing the da_working_domain.
 
 The module has an internal catalogue where are stored some useful information
 regarding the supported data sources.
-This catalogue provide some information like the infrastructure where the data source
-is store, the variables available in a specific dataset and other data.
-It is composed of several files:
+This catalogue provide some information like the infrastructure where the data are stored, the variables available in a specific dataset and other info.
+It is composed of three files:
 
 - **dataset_infrastructures.json**: it contains information about the structure from which download the data, daccess use it to understand which API must be used
 - **\<infrastructures\>_dataset.json**: dataset catalog of a specific infrastructures, it contains the metadata about the supported datasets

@@ -32,11 +32,11 @@ class InputContext:
 
         self._strategy = strategy
 
-    def get_wd(self, workingDomain, dataset) -> dict:
+    def get_wd(self, working_domain_dict, dataset):
         """
-        @param workingDomain: dict with spatial/time information:
+        @param working_domain_dict: dict with spatial/time information:
                 lonLat: list of list, the internal list has the format:  [[minLon , maxLon], [minLat , maxLat]]
                 depth: depth range in string format: [minDepth, maxDepth]
                 time: list of two strings that represent a time range: [YYYY-MM-DDThh:mm:ssZ, YYYY-MM-DDThh:mm:ssZ]
         """
-        return self._strategy.get_wd(workingDomain, dataset)
+        return self._strategy.get_wd(working_domain_dict, dataset)

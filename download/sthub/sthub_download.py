@@ -1,12 +1,13 @@
 import sys
 import time
-
-from download.storagehubfacility import storagehubfacility as sthubf, check_json
-from download.interface.idownload import DownloadStrategy
-from download.storagehubfacility import dataset_access as db
 import json
-from download import utils
 import os
+
+from download.sthub import sthub_facility as sthubf, check_json
+from download.interface.idownload import DownloadStrategy
+from download.sthub import sthub_catalogue
+from download.src import utils
+from download.interface.iworking_domain import WorkingDomain
 
 
 def wait_to_restart_connection(attempt, output_file):
@@ -21,29 +22,6 @@ def handle_network_error(output_file, attempt, max_attempt):
         raise ConnectionError("ERROR An error occurs while download input file")
     else:
         wait_to_restart_connection(attempt, output_file)
-
-
-def get_outfile(field, date):
-    """
-    @param field: cf standard name used to represent a variable
-    @param date: the date of output file
-    @return: the output filename that depends from variables and date
-    """
-    from download import utils
-    type_file = utils.get_type_file(field)
-    date_pattern = date[0:4] + date[5:7]
-    return date_pattern + '_mm-INGV--' + type_file + '-MFSs4b3-MED-fv04.00'
-
-
-def get_filename_from_string_template(string_template):
-    from download import utils
-
-    ID_PRODUCT, type_file, YYYYMM, depth_tmp, lonLat_tmp = string_template.split('%')
-
-    field = utils.get_field(type_file)
-    time = YYYYMM[0:4] + '-' + YYYYMM[4:6]
-
-    return get_outfile(field[0], time)
 
 
 def rm(filename):
@@ -61,7 +39,7 @@ def download_from_sthub(file_to_download, output_file, in_memory, max_attempt, d
     while attempt < max_attempt and not file_is_downloaded:
         try:
             # in_memory false as default -> the file is written on disk as output_file
-            nc_file = myshfo.main(in_memory=in_memory, dl_status=dl_status)     # return None if in_memory == False
+            nc_file = myshfo.main(in_memory=in_memory, dl_status=dl_status)  # return None if in_memory == False
             if not in_memory:  # need to load manually the file if in_memory is False
                 nc_file = load_file_from_filesystem(output_file, return_type)
             file_is_downloaded = True
@@ -96,7 +74,7 @@ class StHub(DownloadStrategy):
         """
         self.outdir = utils.init_dl_dir(outdir)
         self.dataset_id = dataset_id
-        self.dataset = db.Dataset()
+        self.dataset = sthub_catalogue.Catalogue()
         self.dataset_files = self.retrieve_file_available_on_workspace()  # list of (id, name_file) pairs
 
     def retrieve_file_available_on_workspace(self, attempt=0, max_attempt=5):
@@ -124,7 +102,7 @@ class StHub(DownloadStrategy):
         myshfo = sthubf.StorageHubFacility(operation="ItemChildren", ItemId=dir_id)
         myshfo.main()
 
-    def find_files_to_download(self, dataset, fields, working_domain):
+    def find_files_to_download(self, dataset, fields, working_domain: WorkingDomain):
         file_types = self.find_file_types_associated_to_dataset(dataset, fields)
         files_to_download = filter_dataset(self.dataset_files, working_domain, file_types)
         if len(files_to_download) == 0:
@@ -147,14 +125,14 @@ class StHub(DownloadStrategy):
 
     def get_file_from_sthub_workspace(self, file_to_download, in_memory, rm_file, max_attempt, return_type,
                                       dl_status=False):
-        output_file = self.get_output_file(file_to_download)    # path of output file on disk
+        output_file = self.get_output_file(file_to_download)  # path of output file on disk
         if os.path.exists(output_file):
             nc_file = load_file_from_filesystem(output_file, return_type)
         else:
             nc_file = download_from_sthub(file_to_download, output_file, in_memory, max_attempt, dl_status, return_type)
 
         if rm_file:
-            rm(output_file)     # remove the file on disk, keep it only in memory
+            rm(output_file)  # remove the file on disk, keep it only in memory
         return nc_file
 
     def get_output_file(self, file_to_download):
@@ -162,7 +140,7 @@ class StHub(DownloadStrategy):
         output_file = self.outdir + "/" + filename
         return output_file
 
-    def download(self, dataset, working_domain, fields, in_memory=False, rm_file=True, max_attempt=5,
+    def download(self, dataset, working_domain: WorkingDomain, fields, in_memory=False, rm_file=True, max_attempt=5,
                  return_type="netCDF4"):
         """
         @param in_memory: if True the function return a netCDF4.Dataset in memory
@@ -184,32 +162,31 @@ class StHub(DownloadStrategy):
         return nc_files
 
 
-def filter_dataset(file_list, working_domain, file_types):
+def filter_dataset(file_list, working_domain: WorkingDomain, file_types):
     """
     This function filters the input list and return a new list with the file with
     the type of files desired
     @param file_types: pattern that identifies the type of files
-    @param working_domain: dict with time information:
-            time: date in string format: [YYYYMM]
+    @param working_domain: dict with time_list information:
+            time_list: date in string format: [YYYYMM]
     @param file_list: list containing (id, file_name) pairs to be filtered
     @return: list that contains only files of desired type
     """
 
-    time = working_domain['time']
+    time_list = working_domain.get_time()
     filtered_list = list()
     for file in file_list:
         for file_type in file_types:
             if file_type in file[1]:
-                for t in time:
-                    if t + '01_m' in file[1]:   # med pattern: YYYYMM01_m*
+                for t in time_list:
+                    if t + '01_m' in file[1]:  # med pattern: YYYYMM01_m*
                         if file not in filtered_list:
                             filtered_list.append(file)
                     elif t + '.nc' in file[1]:  # glo pattern: *_YYYYMM.nc
                         if file not in filtered_list:
                             filtered_list.append(file)
                     elif t in file[1]:
-                        if file not in filtered_list:   # wind dataset pattern: *YYYYMM_YYYYMM.nc
+                        if file not in filtered_list:  # wind dataset pattern: *YYYYMM_YYYYMM.nc
                             filtered_list.append(file)
-                    break
 
     return filtered_list
