@@ -26,11 +26,11 @@ def init_input_parameters(input_arguments):
     return input_parameters_class
 
 
-def main(args: None):
+def main(args=None):
     json_log = LogMng()
     try:
         if args is None:
-            args = get_args(args)
+            args = get_args()
         input_parameters: InputParameters = init_input_parameters(input_arguments=args)
         json_log.set_input_parameters(input_parameters.get_input_parameters())
     except Exception as e:
@@ -52,8 +52,8 @@ def main(args: None):
     prod_exec.exec(outfile)
 
     # ------------ Plot ------------ #
-    plot_mod = factory.get_module("plot")
-    plot_mod.exec()
+    # plot_mod = factory.get_module("plot")
+    # plot_mod.exec()
 
     # ------------ Close ------------ #
     json_log.set_done(outdir=outdir)

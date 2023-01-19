@@ -36,17 +36,15 @@ class Download(Module):
         data_source = self._input_parameters.get_data_source()
         id_field = self._input_parameters.get_id_field()
 
-        daccess_wd = wd.init_daccess_working_domain(working_domain, freq=freq)
+        time_range = [start_time, end_time]
+        daccess_wd = wd.init_daccess_working_domain(working_domain, time=time_range, freq=freq)
         fields = fields_mng.get_cf_standard_name(id_field)
-        times = time_utils.get_time_range_wd(start_time, end_time, month)
 
         dcs = daccess.Daccess(data_source, fields, output_dir=dl_dir)
         outfile = list()
-        for time in times:
-            daccess_wd['time'] = time
-            if get_template:
-                for file_template in string_template.get_outfile_template(data_source, daccess_wd, fields):
-                    outfile.append(file_template)
-            else:
-                outfile = dcs.download(daccess_wd, return_type="str", rm_file=False)
+        if get_template:
+            for file_template in string_template.get_outfile_template(data_source, daccess_wd, fields):
+                outfile.append(file_template)
+        else:
+            outfile = dcs.download(daccess_wd, return_type="str", rm_file=False)
         return outfile
