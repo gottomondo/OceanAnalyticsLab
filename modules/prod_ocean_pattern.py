@@ -16,7 +16,6 @@ class OceanPatternMockup(Module):
         print(f"INFO File downloaded: {file_list_formatted}")
 
         root_dir = utils.get_root_dir()
-        raise Exception("TEST")
         for file in glob.glob(f"{root_dir}/{MOCK_DIR}/*"):
             filename = os.path.basename(file)
             shutil.copy(file, filename)
