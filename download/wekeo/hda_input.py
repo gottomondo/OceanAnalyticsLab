@@ -60,11 +60,6 @@ class InHDA(InputStrategy):
             raise Exception("Can't extract vertical domain from wd: " + str(working_domain))
         return depth
 
-    # time information from daccess is already correct
-    def get_time_range(self, working_domain):
-        if 'time' not in working_domain:
-            raise Exception("Can't read time from workingDomain")
-        return working_domain['time']
 
     def get_lon_lat(self, working_domain, product_id):
         """

@@ -43,6 +43,8 @@ def extract_month(input_date):
     if isinstance(input_date, str):
         if len(input_date) == 6 or len(input_date) == 7:     # case date format is YYYYMM or YYYY-MM
             month = int(input_date[-2:])
+        elif len(input_date) == 10:     # case date format is YYYY-MM-DD
+            month = int(input_date.split("-")[1])
         else:
             raise Exception(f"ERROR Can't extract month from date: {input_date}")
     else:

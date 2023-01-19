@@ -16,16 +16,13 @@ def check_working_domain(working_domain: dict):
     print("working domain is correct")
 
 
-def init_daccess_working_domain(working_domain: dict=None, lonLat=None, depth=None, time=None):
-    """
-    Extract spatial/time information from args and save it in a new dict()
-    @param args:
-    @return:
-    """
+def init_daccess_working_domain(working_domain: dict=None, lonLat=None, depth=None, time=None, freq="m"):
+    """Extract spatial/time information from args and save it in a new dict()"""
     daccess_wd = dict()
     daccess_wd['lonLat'] = extract_daccess_lonLat(working_domain) if lonLat is None else lonLat
     daccess_wd['depth'] = extract_daccess_depth(working_domain) if depth is None else depth
     daccess_wd['time'] = None if time is None else time
+    daccess_wd['time_freq'] = freq
     return daccess_wd
 
 

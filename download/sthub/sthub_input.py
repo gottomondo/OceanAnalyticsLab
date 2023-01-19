@@ -22,11 +22,6 @@ class InStHub(InputStrategy):
         depth = working_domain.get('depth', None)
         return depth
 
-    def get_time_range(self, working_domain):
-        if 'time' not in working_domain:
-            raise Exception("Can't read time from workingDomain")
-        return working_domain['time']
-
     def get_wd(self, working_domain_dict, product_id):
         """
                     @param product_id: product to download
