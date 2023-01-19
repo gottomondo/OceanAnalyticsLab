@@ -1,5 +1,5 @@
 from input.iparameters import InputParameters
-from modules import retrieve_file, prod_ocean_climate, plot
+from modules import retrieve_file, prod_ocean_climate, plot, prod_ssi
 from log.logmng import LogMng
 
 
@@ -14,7 +14,7 @@ class ModulesFactory:
             phase = plot.Plot(input_parameters=self._input_parameters,
                               json_log=self._json_log,
                               error_code=error_code)
-        elif phase_name == "prod":
+        elif phase_name == "prod_ocean_climate":
             error_code = 4
             phase = prod_ocean_climate.OceanClimateMockup(input_parameters=self._input_parameters,
                                                           json_log=self._json_log,
@@ -24,6 +24,11 @@ class ModulesFactory:
             phase = retrieve_file.Download(input_parameters=self._input_parameters,
                                            json_log=self._json_log,
                                            error_code=error_code)
+        elif phase_name == "prod_ssi":
+            error_code = 4
+            phase = prod_ssi.SSIMockup(input_parameters=self._input_parameters,
+                                       json_log=self._json_log,
+                                       error_code=error_code)
         else:
             raise Exception("ERROR: Selected phase is unknown: " + phase_name)
 

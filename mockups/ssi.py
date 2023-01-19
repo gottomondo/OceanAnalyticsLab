@@ -9,6 +9,7 @@ from modules import modules_factory
 
 DOWNLOAD_DIR = "indir"  # where download/read data
 DATASET_FREQ = "y"
+MOCK_DIR = "mockups/mock_ssi"
 
 
 def get_args():
@@ -27,7 +28,7 @@ def init_input_parameters(input_arguments):
 
 
 def main(args=None):
-    json_log = LogMng()
+    json_log = LogMng(mock_dir=MOCK_DIR)
     try:
         if args is None:
             args = get_args()
@@ -46,6 +47,10 @@ def main(args=None):
     # ------------ Download ------------ #
     download = factory.get_module("retrieve_file")
     outfile: list = download.exec(input_dir, DATASET_FREQ)
+
+    # ------------ Execution ------------ #
+    prod_exec = factory.get_module("prod_ssi")
+    prod_exec.exec(outfile)
 
     # ------------ Close ------------ #
     json_log.set_done(outdir=outdir)

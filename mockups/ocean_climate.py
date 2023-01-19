@@ -9,6 +9,7 @@ from modules import modules_factory
 
 DOWNLOAD_DIR = "indir"  # where download/read data
 DATASET_FREQ = "m"
+MOCK_DIR = "mockups/mock_ocean_climate"
 
 
 def get_args():
@@ -48,7 +49,7 @@ def main(args=None):
     outfile: list = download.exec(input_dir, DATASET_FREQ)
 
     # ------------ Execution ------------ #
-    prod_exec = factory.get_module("prod")
+    prod_exec = factory.get_module("prod_ocean_climate")
     prod_exec.exec(outfile)
 
     # ------------ Plot ------------ #

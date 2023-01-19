@@ -1,4 +1,6 @@
+import os.path
 import sys
+import glob
 
 from log.exec_info import ExecInfo
 from log.status_info import LogError
@@ -8,13 +10,14 @@ from tools import utils
 
 
 class LogMng:
-    def __init__(self, input_parameters_dict: dict = None):
+    def __init__(self, input_parameters_dict: dict = None, mock_dir="mock"):
         self.input = input_parameters_dict
         self.exec_info = ExecInfo()
         self.other = OtherInfo()
         self.error_log = LogError()
         self.end_time = None
         self.worker_logs = None
+        self._mock_dir = mock_dir
 
     def set_input_parameters(self, input_parameters):
         self.input = input_parameters
@@ -88,7 +91,8 @@ class LogMng:
 
         # wps method will always look for the output files, also if execution has failed
         # provide mock output files allow us to be able to return a correct log file
-        shutil.copy("./mock/output.nc", "output.nc")
-        shutil.copy("./mock/output.png", "output.png")
+        for file in glob.glob(self._mock_dir + '/*'):
+            filename = os.path.basename(file)
+            shutil.copy(file, filename)
 
         self.write_json()
