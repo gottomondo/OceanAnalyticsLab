@@ -1,5 +1,4 @@
 import shutil
-import glob
 
 from modules.module import Module
 from tools import utils
@@ -7,8 +6,7 @@ from tools import utils
 
 class OceanClimateMockup(Module):
 
-    def _exec_impl(self, input_dir: str):
-        input_files = glob.glob(input_dir + '/*.nc')
+    def _exec_impl(self, input_files: list):
         file_list_formatted = "\n\t\t- ".join(['', *input_files])
         print(f"INFO File downloaded: {file_list_formatted}")
 

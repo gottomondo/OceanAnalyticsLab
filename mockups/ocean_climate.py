@@ -7,13 +7,14 @@ from log.logmng import LogMng
 from tools import utils
 from modules import modules_factory
 
-download_dir = "indir"  # where download/read data
+DOWNLOAD_DIR = "indir"  # where download/read data
+DATASET_FREQ = "m"
 
 
 def get_args():
     import argparse
 
-    parse = argparse.ArgumentParser(description="Mockup method")
+    parse = argparse.ArgumentParser(description="Ocean Climate Mockup method")
     parse.add_argument('input_parameters', type=str, help="JSON-like string (use ' instead of \")")
 
     return parse.parse_args()
@@ -37,18 +38,18 @@ def main(args: None):
         exit(1)
 
     root_dir = utils.get_root_dir()
-    input_dir = root_dir + '/' + download_dir
+    input_dir = root_dir + '/' + DOWNLOAD_DIR
     outdir = root_dir  # sequential and master mode
 
     factory = modules_factory.ModulesFactory(input_parameters=input_parameters, json_log=json_log)
 
     # ------------ Download ------------ #
     download = factory.get_module("retrieve_file")
-    download.exec(input_dir)
+    outfile: list = download.exec(input_dir, DATASET_FREQ)
 
     # ------------ Execution ------------ #
     prod_exec = factory.get_module("prod")
-    prod_exec.exec(input_dir)
+    prod_exec.exec(outfile)
 
     # ------------ Plot ------------ #
     plot_mod = factory.get_module("plot")

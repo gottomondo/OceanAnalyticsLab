@@ -41,9 +41,9 @@ def generate_time_list(start_time, end_time, time_freq):
 
 def extract_month(input_date):
     if isinstance(input_date, str):
-        if len(input_date) == 6 or len(input_date) == 7:     # case date format is YYYYMM or YYYY-MM
+        if len(input_date) == 6 or len(input_date) == 7:  # case date format is YYYYMM or YYYY-MM
             month = int(input_date[-2:])
-        elif len(input_date) == 10:     # case date format is YYYY-MM-DD
+        elif len(input_date) == 10:  # case date format is YYYY-MM-DD
             month = int(input_date.split("-")[1])
         else:
             raise Exception(f"ERROR Can't extract month from date: {input_date}")
@@ -65,3 +65,17 @@ def extract_day(input_date):
 def get_number_day_in_month(year, month):
     from calendar import monthrange
     return monthrange(year, month)[1]  # to get the correct last day of end_month
+
+
+def get_month_range(date=None, YYYYMM: str = None):
+    import datetime
+    import calendar
+    month_range = list()
+    if YYYYMM is not None:
+        date = datetime.datetime(year=int(YYYYMM[0:4]), month=int(YYYYMM[4:6]), day=1)
+    last_month_day = calendar.monthrange(date.year, date.month)[1]
+    date_end_month = datetime.datetime(year=date.year, month=date.month, day=last_month_day)
+    month_range.append(date.strftime("%Y-%m-%d") + 'T00:00:00.000Z')
+    month_range.append(date_end_month.strftime("%Y-%m-%d") + 'T23:59:59.999Z')
+
+    return month_range

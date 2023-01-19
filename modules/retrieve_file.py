@@ -1,5 +1,6 @@
 import os
 
+import glob
 from modules.module import Module
 from tools import fields_mng
 from tools import time_utils
@@ -14,11 +15,12 @@ class Download(Module):
 
         return files_to_process
 
-    def retrieve_file(self, dl_dir: str, get_template: bool = False):
+    def retrieve_file(self, dl_dir: str, freq: str, get_template: bool = False):
         """
         Function to retrieve the requested files.
         Args:
             dl_dir: download where store the file
+            freq: dataset frequency
             get_template: If True, daccess return some special string which can be used later to download the files.
                 This function is used to know how much files the algorithm needs before to start the execution.
 
@@ -27,13 +29,14 @@ class Download(Module):
         """
         if os.path.isdir(dl_dir):
             print(f"INFO download dir {dl_dir} already exists, nothing to do...")
-             #return
+            input_files = glob.glob(dl_dir + '/*.nc')
+            return input_files
         start_time, end_time, month = self._input_parameters.get_start_end_time_and_month()
         working_domain = self._input_parameters.get_working_domain()
         data_source = self._input_parameters.get_data_source()
         id_field = self._input_parameters.get_id_field()
 
-        daccess_wd = wd.init_daccess_working_domain(working_domain)
+        daccess_wd = wd.init_daccess_working_domain(working_domain, freq=freq)
         fields = fields_mng.get_cf_standard_name(id_field)
         times = time_utils.get_time_range_wd(start_time, end_time, month)
 
@@ -45,5 +48,5 @@ class Download(Module):
                 for file_template in string_template.get_outfile_template(data_source, daccess_wd, fields):
                     outfile.append(file_template)
             else:
-                dcs.download(daccess_wd, rm_file=False)
+                outfile = dcs.download(daccess_wd, return_type="str", rm_file=False)
         return outfile

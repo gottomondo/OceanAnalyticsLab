@@ -2,8 +2,8 @@ import input.working_domain
 
 
 def revert_string_template(string_template):
-    from download import utils
-    from tools import time_utils as tu
+    from download.src import utils
+    from download.src import time_utils as tu
 
     ID_PRODUCT, type_file, YYYYMM, depth_tmp, lonLat_tmp = string_template.split('%')
 
@@ -31,7 +31,7 @@ def get_date(string_template):
 
 
 def get_outfile_template(dataset, daccess_wd, fields):
-    from download import utils
+    from download.src import utils
     # [minLon, maxLon, minLat , maxLat]
     lonLat = daccess_wd['lonLat']
     depth = daccess_wd['depth']
