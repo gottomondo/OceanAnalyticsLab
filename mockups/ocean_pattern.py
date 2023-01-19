@@ -9,13 +9,13 @@ from modules import modules_factory
 
 DOWNLOAD_DIR = "indir"  # where download/read data
 DATASET_FREQ = "m"
-MOCK_DIR = "mockups/mock_ocean_climate"
+MOCK_DIR = "mockups/mock_ocean_pattern"
 
 
 def get_args():
     import argparse
 
-    parse = argparse.ArgumentParser(description="Ocean Climate Mockup method")
+    parse = argparse.ArgumentParser(description="Ocean Pattern Mockup method")
     parse.add_argument('input_parameters', type=str, help="JSON-like string (use ' instead of \")")
 
     return parse.parse_args()
@@ -49,7 +49,7 @@ def main(args=None):
     outfile: list = download.exec(input_dir, DATASET_FREQ)
 
     # ------------ Execution ------------ #
-    prod_exec = factory.get_module("prod_ocean_climate")
+    prod_exec = factory.get_module("prod_ocean_pattern")
     prod_exec.exec(outfile)
 
     # ------------ Plot ------------ #
