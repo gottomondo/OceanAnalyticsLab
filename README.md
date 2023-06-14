@@ -32,6 +32,14 @@ then put your key in hdaKey param [daccess.py](./download/daccess.py)
 ##### Attention: by default the system use bluecloud proxy to request the token to access to hda, if you put your hda key the proxy will be disabled
 
 
+3. Setup Virtualenv
+
+```
+$ virtualenv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+```
+
 ### Run the algorithm
 This repo contains three different mockups:
 
@@ -40,6 +48,9 @@ This repo contains three different mockups:
 - **Ocean Pattern Mockup**
 
 It is present a unique main which give the possibility to choose wich mockup to exec.
+
+*Be sure that the **indir** directory is not present before starting the tool*
+
 Here the info about mockup execution:
 
 ```bash
@@ -61,7 +72,7 @@ options:
 
 Then with the option arguments -o, -s, -p it is possible to choose a specific mockup.
 TO notice that the mockups don't exec some real computation. It depends on the specific mockup, but in general they performs
-only a download of the requested files and then simpy copy some mockup outputs.
+only a download of the requested files and then simply copy some mockup outputs.
 
 Here some instruction to exec the three mockups:
 
