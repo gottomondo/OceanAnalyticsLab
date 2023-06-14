@@ -1,14 +1,27 @@
-# Mockup method
+# Overview
 
-This is a simple tools to deploy a working method on D4Science.
-In this method are included some extra modules (which are still in development):
+This tool is a simple data processing method that developers can deploy on D4Science, following the tutorial **mockup_method_guide.pptx**.
+The method includes some extra modules (which are still in development):
 
 - **download module**: With this module it is possible to download netCDF files from WEkEO and StorageHub.
 - **log manager**: With this module it is possible to store some execution info, error info and to provide always the expected output files to WPS protoc also in case of errors
 - **input manager**: With this module it is possible to manage the input parameters string
 
 
-## Instruction
+
+## How to implement a new method
+
+New algorithms can be implemented in new methods with their specific interface for the inputs and outputs.
+
+The mockup method can generally be considered as a convenient baseline for a new implementation, which will have its own
+input parameters, download of input data, processing, and output preparation.
+
+To ease the following integration between interface/s and method/s, the recommended best practice consists 
+in implementing also a corresponding new mockup method which implement the new input/output interface, without actual actions 
+(i.e.: data download, processing,...). 
+
+
+## Instructions to use the mockup method
 
 ### Preparation
 
