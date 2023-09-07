@@ -1,0 +1,15 @@
+{
+    "error": {
+        "code": 0,
+        "message": "Execution Done"
+    },
+    "exec_info": [
+        "[09/21/2020, 17:09:58]   -   Download files",
+        "[09/21/2020, 17:09:58]   -   Download completed",
+        "[09/21/2020, 17:09:58]   -   Generating xml template",
+        "[09/21/2020, 17:09:58]   -   Completed xml template",
+        "[09/21/2020, 17:09:58]   -   Start map reduce",
+        "[09/21/2020, 17:09:58]   -   Completed map reduce,  time needed:  5.0067901611328125e-06 seconds ",
+        "[09/21/2020, 17:09:58]   -   Total time:  0.040907859802246094 seconds "
+    ]
+}

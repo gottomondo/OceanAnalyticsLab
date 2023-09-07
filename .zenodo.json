@@ -1,0 +1,49 @@
+{
+    "description": "Experimentation and development of production frameworks for Ocean Science algorithms",
+    "license": "Apache-2.0",
+    "title": "Ocean Analytics Lab",
+    "upload_type": "software",
+    "creators": [
+        {
+            "affiliation": "CMCC Foundation, Italy",
+            "name": "Drudi, Massimiliano",
+            "orcid": "0000-0002-9951-740X"
+        },
+        {
+            "affiliation": "CMCC Foundation, Italy",
+            "name": "Mariani, Antonio",
+            "orcid": "0000-0001-5720-3069"
+        },
+        {
+            "affiliation": "CMCC Foundation, Italy",
+            "name": "Palermo, Francesco",
+            "orcid": "0000-0002-0463-4655"
+        },
+        {
+            "affiliation": "CMCC Foundation, Italy",
+            "name": "Lecci, Rita",
+            "orcid": "0000-0003-2996-4295"
+        }
+    ],
+    "contributors": [
+        {
+            "affiliation": "KNMI, Netherlands",
+            "name": "Noteboom, Jan Willem",
+            "orcid": "0000-0002-4909-7865",
+            "type": "Researcher"
+        },
+        {
+            "affiliation": "LOPS, Ifremer, France",
+            "name": "Balem, Kevin",
+            "orcid": "0000-0002-4956-8698",
+            "type": "Researcher"
+        },
+        {
+            "affiliation": "LOPS, Ifremer, France",
+            "name": "Bachelot, Loïc",
+            "orcid": "0000-0003-0711-8581",
+            "type": "Researcher"
+        }
+    ],
+    "access_right": "open"
+}
