@@ -3,6 +3,7 @@
 from mockups import ocean_climate
 from mockups import ssi
 from mockups import ocean_pattern
+import base64
 
 download_dir = "indir"  # where download/read data
 
@@ -21,6 +22,8 @@ def get_args():
 
 def main():
     args = get_args()
+    args.input_parameters = base64.b64decode(args.input_parameters).decode("utf-8")
+
     ocean_climate_flag = args.ocean_climate
     ssi_flag = args.ssi
     ocean_pattern_flag = args.ocean_pattern
